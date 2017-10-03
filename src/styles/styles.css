@@ -1,0 +1,14 @@
+#app{
+    font: 16px 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    color: #0d3349;
+    min-width: 700px;
+    min-height: 1200px;
+    margin: 0 auto;
+}
+
+a.activate {
+    color: darkorange;
+}
+nav{
+    padding-top: 20px;
+}
