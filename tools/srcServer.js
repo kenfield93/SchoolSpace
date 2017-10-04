@@ -9,6 +9,7 @@ import open from 'open';
 import config from './config';
 /* eslint-disable no-console */
 import userModel from '../model/users';
+import apiRouterFactory from '../src/api/API/v1/index';
 
 console.log("ayyo");
 
@@ -27,26 +28,10 @@ app.use(require('webpack-dev-middleware')(compiler, {
 
 app.use(require('webpack-hot-middleware')(compiler));
 
+const apiRouter = apiRouterFactory(express.Router());
+app.use('/v1', apiRouter );
 
-/*
-app2.get('/v1/courses', function(req, res){
-    console.log("Worship me");
-    userModel.getCourses(6)
-        .then(result => {
-            res.status(200).send({result});
-        }).catch(err => {  res.status(500).send([]);});
-});
-*/
-app.use('/v1/*', function(req, res, next){
 
-    if(req.originalUrl == '/v1/courses'){
-        console.log("my authority");
-        userModel.getCourses(6)
-            .then(result => {
-                res.status(200).send(result);
-            }).catch(err => {  res.status(500).send([]);});
-    }
-});
 //TODO change this for multi page webapp
 // diside which routes form what pages. Probably have each class as a seprate page
 app.get('*', function(req, res) {
