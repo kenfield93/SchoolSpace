@@ -4,5 +4,6 @@
 export default {
     userCourses: [],
     threads: null,
+    posts: null,
     numAjaxCallsInProgress: 0
 };

@@ -12,6 +12,6 @@ export default function debounce(fn, timer, callee){
         timeoutId = setTimeout(()=> {
             fn.apply(callee, args);
         }, timer);
-    }
+    };
 }
 

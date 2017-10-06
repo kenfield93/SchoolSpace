@@ -16,7 +16,12 @@ export function loadCourseThreadsSuccess(threads){
 export function loadCourseThreadsFailure(err){
     return {type: types.LOAD_COURSE_THREADS_FAILURE, err};
 }
-
+export function loadPostsSuccess(posts){
+    return {type: types.LOAD_THREAD_POSTS_SUCCESS, posts};
+}
+export function loadPostsFailure(err){
+    return {type: types.LOAD_THREAD_POSTS_FAILURE, err};
+}
 /* thunks */
 
 // backend would find out corresponding userId via OAuth or session or someshit
@@ -48,14 +53,24 @@ export function loadUsersCourses(){
 export function loadCourseThreads(classId){
     return function(dispatch){
         dispatch(startAjaxCall());
-        return axios.get(`http://${config.host}:${config.port}/v1/threads/${classId}`)
+        return axios.get(`http://${config.host}:${config.port}/v1/threadsByClassId/${classId}`)
             .then(threads => {
-                console.log('threads');
-                console.log(threads.data);
                 dispatch(loadCourseThreadsSuccess(threads.data));
             }).catch(err => {
-                console.log("error bb");
                 dispatch(loadCourseThreadsFailure(err));
+                return Promise.reject(err);
+            });
+    };
+}
+
+export function getPostByThread(threadId){
+    return function(dispatch){
+        dispatch(startAjaxCall());
+        return axios.get(`http://${config.host}:${config.port}/v1/postsByThreadId/${threadId}`)
+            .then(posts => {
+                dispatch(loadPostsSuccess({posts: posts.data, threadId}));
+            }).catch(err => {
+                dispatch(loadPostsFailure(err));
                 return Promise.reject(err);
             });
     };

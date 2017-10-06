@@ -5,6 +5,7 @@ import userModel from '../../../../model/users';
 import courseModel from '../../../../model/course';
 
 //TODO extract the api logic out to a controller folder
+//TODO set up middleware for non fatal errors? like if we call next() from a func it should go to that error next
 export default function (Router){
 
     //Can set middleware for router to do things like log api usage, authenticate, etc..
@@ -34,11 +35,26 @@ export default function (Router){
         next();
     });
     */
-    Router.get('/threads/:classId', function(req, res, next){
-            courseModel.getThreadPosts(1)
-                .then(result => {
-                    res.status(200).send(result);
-                }).catch(err => {res.status(500).send([])});
+    Router.get('/threadsByClassId/:classId', function(req, res, next){
+        const classId = req.params.classId;
+        if(!classId || isNaN(classId) || classId < 1)
+            return res.status(422).send("Error: Must get threads by ClassId");
+        courseModel.getThreads(classId)
+            .then(result => {
+                res.status(200).send(result);
+            }).catch(err => {res.status(500).send([]); });
+    });
+
+    Router.get('/postsByThreadId/:threadId', function(req, res, next){
+        const thrId = req.params.threadId;
+        if(!thrId || isNaN(thrId) || thrId < 1)
+            return res.status(422).send("Error: Must get posts by ThreadId");
+        courseModel.getThreadPosts(thrId)
+            .then(result => {
+                res.status(200).send(result);
+            }).catch(err => {
+            res.status(500).send([]); });
+
     });
     return Router;
 }

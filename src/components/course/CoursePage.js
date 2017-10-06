@@ -5,34 +5,19 @@ import React, {PropTypes} from 'react';
 import {connect} from 'react-redux';
 import * as courseAction from '../../actions/courseActions';
 import Debounce from '../../utils/debounce';
+import ThreadDirectory from './ThreadDirectory';
 
 import Searchbar from './Searchbar';
 
 class CoursePage extends React.Component{
-    constructor(props){
-        super(props);
-        this.state = {
-          searchTerm: ''
-        };
 
-        this.onSearchTermChange = this.onSearchTermChange.bind(this);
-    }
-
-    onSearchTermChange(newSearchTerm){
-        this.setState({searchTerm: newSearchTerm});
-    }
+    //TODO think about just getting threads from store at lower level
     render() {
         return (
             <div>
-                <h2>Christan boy im going to throw you in hell</h2>
-                {
-                    //just realised this is post and not threads lol
-                    this.props.threads.map( thread => <p key={thread.id}> {thread.posttext} </p>)
-                }
-                <div className="sidebar">
-                    <Searchbar searchAction={this.onSearchTermChange}/>
-                </div>
+                    <ThreadDirectory threads={this.props.threads} searchAction={this.onSearchTermChange} />
             </div>
+
         );
     }
 
