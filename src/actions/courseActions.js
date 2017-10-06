@@ -48,10 +48,13 @@ export function loadUsersCourses(){
 export function loadCourseThreads(classId){
     return function(dispatch){
         dispatch(startAjaxCall());
-        return courseAPI.getThreadsForClass(classId)
+        return axios.get(`http://${config.host}:${config.port}/v1/threads/${classId}`)
             .then(threads => {
-                dispatch(loadCourseThreadsSuccess(threads));
+                console.log('threads');
+                console.log(threads.data);
+                dispatch(loadCourseThreadsSuccess(threads.data));
             }).catch(err => {
+                console.log("error bb");
                 dispatch(loadCourseThreadsFailure(err));
                 return Promise.reject(err);
             });

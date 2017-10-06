@@ -6,6 +6,8 @@ import webpack from 'webpack';
 import path from 'path';
 import webpackConfig from '../webpack.config.dev';
 import open from 'open';
+import bodyparser from 'body-parser';
+
 import config from './config';
 /* eslint-disable no-console */
 import userModel from '../model/users';
@@ -27,6 +29,8 @@ app.use(require('webpack-dev-middleware')(compiler, {
 }));
 
 app.use(require('webpack-hot-middleware')(compiler));
+app.use(bodyparser.json());
+app.use(bodyparser.urlencoded({extended: true}));
 
 const apiRouter = apiRouterFactory(express.Router());
 app.use('/v1', apiRouter );

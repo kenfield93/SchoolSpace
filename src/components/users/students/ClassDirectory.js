@@ -11,7 +11,6 @@ class ClassDirectory extends React.Component{
         super(props);
     //    this.state = {classes: []};
 
-        //classAPI.getUserClasses(69).then(result => {alert(JSON.stringify(result)); this.state.classes = result;});
     }
 
     /*
@@ -26,9 +25,6 @@ class ClassDirectory extends React.Component{
         return(
             <div>
                 <h2> Class List</h2>
-                {
-                  // this.props.courses && this.props.courses.map((ele, i) => <p key={i}>{ele.name}</p>)
-                }
                 <CourseList courses={this.props.courses}/>
             </div>
         );

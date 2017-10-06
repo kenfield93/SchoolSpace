@@ -80,8 +80,6 @@ userModel.getCourses = (userId) => {
            console.log("Y HAVE U FORSAKEn me");
            return false;
        }
-       // console.log("rows= ");
-      //  console.log(result.rows);
        return result.rows;
     });
 };

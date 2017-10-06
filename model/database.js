@@ -127,6 +127,8 @@ const category = () => {
     );
 };
 
+//think about making an index over usrId
+
 const post = () => {
 
     return(
@@ -136,6 +138,7 @@ const post = () => {
         " thrId INTEGER REFERENCES thread(thrId), " +
         " postText text NOT NULL CHECK(length(postText)>1), " +
         " responseToPostId INTEGER REFERENCES post(postId), " +
+        " postTime timestamp DEFAULT current_timestamp " +
         " likeCnt INTEGER ); "
     );
 };
