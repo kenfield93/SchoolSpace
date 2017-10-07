@@ -5,6 +5,7 @@ import React from 'react';
 import Searchbar from './Searchbar';
 import ThreadList from './ThreadList';
 
+//TODO make this connected component and change the thread display frame (need to create) everytime  state.focusedThreadId changes
 const styles = {
     container_style:
     {
@@ -32,10 +33,12 @@ class ThreadDirectory extends React.Component{
     constructor(props){
         super(props);
         this.state = {
-            searchTerm: ''
+            searchTerm: '',
+            focusedThreadId: -1
         };
 
         this.onSearchTermChange = this.onSearchTermChange.bind(this);
+        this.generateOnThreadClick = this.generateOnThreadClick.bind(this);
     }
 
     onSearchTermChange(newSearchTerm){
@@ -51,13 +54,23 @@ class ThreadDirectory extends React.Component{
            );
         });
     }
+   generateOnThreadClick(threadId){
+       return function(){
+           this.setState({focusedThreadId: threadId}, () => {
+               alert("Thread focus id changed to " + this.state.focusedThreadId);
+           });
+       }.bind(this);
+
+    }
     render(){
         return(
             <div style={styles.container_style} className="container"  >
                     <h2> Threads and stuff</h2>
                     <Searchbar styles={styles.searchbar_style} searchAction={this.onSearchTermChange}/>
                    <hr />
-                    <ThreadList threads={this.filterThreadByTerm(this.props.threads, this.state.searchTerm)} />
+                    <ThreadList onThreadClickGenerator={this.generateOnThreadClick}
+                                threads={this.filterThreadByTerm(this.props.threads, this.state.searchTerm)}
+                    />
             </div>
         );
     }
