@@ -16,8 +16,11 @@ export function loadCourseThreadsSuccess(threads){
 export function loadCourseThreadsFailure(err){
     return {type: types.LOAD_COURSE_THREADS_FAILURE, err};
 }
-export function loadPostsSuccess(posts){
-    return {type: types.LOAD_THREAD_POSTS_SUCCESS, posts};
+export function loadPostsSuccess(posts, threadId){
+    console.log('loadPostSuccess');
+    console.log("threadId %s", threadId);
+   // threadId = 1;
+    return {type: types.LOAD_THREAD_POSTS_SUCCESS, payload: {threadId, posts}};
 }
 export function loadPostsFailure(err){
     return {type: types.LOAD_THREAD_POSTS_FAILURE, err};
@@ -30,23 +33,11 @@ export function loadUsersCourses(){
         dispatch(startAjaxCall());
         return axios.get(`http://${config.host}:${config.port}/v1/courses`)
             .then(courses => {
-                console.log("notice me");
-                console.log(courses.data);
                 dispatch(loadUsersCoursesSuccess(courses.data));
             }, err => {
-                console.log("bow to me");
                 dispatch(loadUsersCoursesFailure(err));
                 return Promise.reject(err);
             });
-        /*
-        return courseAPI.getUserClasses()
-            .then(courses => {
-                dispatch(loadUsersCoursesSuccess(courses));
-            }, err => {
-                dispatch(loadUsersCoursesFailure(err));
-                return Promise.reject(err);
-            });
-            */
     };
 }
 
@@ -63,12 +54,12 @@ export function loadCourseThreads(classId){
     };
 }
 
-export function getPostByThread(threadId){
+export function loadPostsByThread(threadId){
     return function(dispatch){
         dispatch(startAjaxCall());
         return axios.get(`http://${config.host}:${config.port}/v1/postsByThreadId/${threadId}`)
             .then(posts => {
-                dispatch(loadPostsSuccess({posts: posts.data, threadId}));
+                dispatch(loadPostsSuccess( posts.data, threadId));
             }).catch(err => {
                 dispatch(loadPostsFailure(err));
                 return Promise.reject(err);

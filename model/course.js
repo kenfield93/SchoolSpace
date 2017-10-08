@@ -29,7 +29,7 @@ courseModel.createCourse = (orgId, title, ssId) => {
 courseModel.getThreadPosts = (thrId) => {
     var sql =
 
-        "SELECT p.postId as id, postText, responseToPostId, postTime, likeCnt, name " +
+        "SELECT p.postId as id, postText as text, responseToPostId, postTime, likeCnt, name " +
         "FROM (thread AS t INNER JOIN users as u " +
         "ON t.usrId = u.usrId ) AS usrThread " +
         "INNER JOIN post AS p " +

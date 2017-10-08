@@ -9,14 +9,15 @@ import ThreadList from './ThreadList';
 const styles = {
     container_style:
     {
-        width: '20%',
-        position: 'absolute',
-        paddingBottom: 10,
+        width: '25%',
+      //  position: 'absolute',
+        //paddingBottom: 10,
         borderStyle: 'solid',
         borderColor: '#aaaeef',
         borderWidth: 1,
         marginBottom: 10,
-        marginLeft: '0px'
+        marginLeft: '0px',
+        float: 'left'
     },
     searchbar_style:
     {
@@ -56,10 +57,9 @@ class ThreadDirectory extends React.Component{
     }
    generateOnThreadClick(threadId){
        return function(){
-           this.setState({focusedThreadId: threadId}, () => {
-               alert("Thread focus id changed to " + this.state.focusedThreadId);
-           });
+           this.props.setThreadFocus(threadId);
        }.bind(this);
+
 
     }
     render(){

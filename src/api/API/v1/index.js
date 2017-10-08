@@ -47,7 +47,7 @@ export default function (Router){
 
     Router.get('/postsByThreadId/:threadId', function(req, res, next){
         const thrId = req.params.threadId;
-        if(!thrId || isNaN(thrId) || thrId < 1)
+        if(!thrId || isNaN(thrId) )
             return res.status(422).send("Error: Must get posts by ThreadId");
         courseModel.getThreadPosts(thrId)
             .then(result => {
