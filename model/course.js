@@ -26,17 +26,20 @@ courseModel.createCourse = (orgId, title, ssId) => {
     });
 };
 
+
 courseModel.getThreadPosts = (thrId) => {
     var sql =
-
-        "SELECT p.postId as id, postText as text, responseToPostId, postTime, likeCnt, name " +
-        "FROM (thread AS t INNER JOIN users as u " +
-        "ON t.usrId = u.usrId ) AS usrThread " +
-        "INNER JOIN post AS p " +
-        "ON p.thrId = usrThread.thrId " +
-        "WHERE usrThread.thrId = $1 " +
-        "ORDER BY p.responseToPostId DESC , p.postTime ;"
+        "SELECT tp.id, text, responseToPostId, postTime, likeCnt, name " +
+        "FROM ( SELECT p.usrId AS usrId, p.responseToPostId, p.postText as text, p.postId as id, p.postTime, p.likeCnt " +
+        "FROM post p INNER JOIN thread t " +
+        "ON p.thrId = t.thrId " +
+        "WHERE p.thrId = $1 " +
+        ") AS tp " +
+        "INNER JOIN users u " +
+        "ON u.usrId = tp.usrId " +
+        "ORDER BY tp.responseToPostId DESC, tp.postTime ; "
     ;
+
     return dbPool.preparedquery(sql, [thrId], function(err, result){
         return (err) ? false : result.rows;
     });

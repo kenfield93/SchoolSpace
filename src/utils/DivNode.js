@@ -14,7 +14,7 @@ class DivNode{
     getDiv(padding){
         return(
           <div>
-             <p style={{paddingLeft: padding || 0}}key={this.post.id}> {this.post.text} </p>
+             <p style={{paddingLeft: padding || 0}}key={this.post.id}> {this.post.id}:{this.post.name}:{this.post.text} </p><br/>
           </div>
         );
     }
