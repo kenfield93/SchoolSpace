@@ -9,6 +9,9 @@ import ThreadList from './ThreadList';
 const styles = {
     container_style:
     {
+        float: 'left',
+        width: '30%'
+        /*
         width: '25%',
       //  position: 'absolute',
         //paddingBottom: 10,
@@ -18,15 +21,18 @@ const styles = {
         marginBottom: 10,
         marginLeft: '0px',
         float: 'left'
+        */
     },
     searchbar_style:
     {
+        /*
         width: '100%',
         paddingBottom: 5,
         borderBottomStyle: 'solid',
         borderBottomColor: 'blue',
         borderBottomWidth: 2,
         marginBottom: 2
+        */
     }
 };
 
@@ -64,7 +70,7 @@ class ThreadDirectory extends React.Component{
     }
     render(){
         return(
-            <div style={styles.container_style} className="container"  >
+            <div style={styles.container_style}  >
                     <h2> Threads and stuff</h2>
                     <Searchbar styles={styles.searchbar_style} searchAction={this.onSearchTermChange}/>
                    <hr />

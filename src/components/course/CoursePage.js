@@ -11,17 +11,14 @@ import MainDisplay from './MainDisplay';
 import Searchbar from './Searchbar';
 
 const styles = {
+
     wrapper: {
-      //  display: 'inline-block',
-        textAlign: 'left', /* Resetting the text alignment */
-        verticalAlign: 'top' /* Making sure inline-block element align to the top */
-    },
-    wrapperLeftDiv:{
-        float: 'left'
-    },
-    wrapperRightDiv:{
-        float: 'right'
+        display: 'inline-block'
+        //textAlign: 'left', /* Resetting the text alignment */
+       // verticalAlign: 'top' /* Making sure inline-block element align to the top */
     }
+
+
 };
 
 class CoursePage extends React.Component{
@@ -57,7 +54,7 @@ class CoursePage extends React.Component{
     //TODO think about just getting threads from store at lower level
     render(){
         return (
-            <div style={styles.wrapper}>
+            <div className="container" style={styles.wrapper}>
                     <ThreadDirectory threads={this.props.threads} searchAction={this.onSearchTermChange} setThreadFocus={this.setThreadFocus}/>
                     <MainDisplay threadId={this.state.threadFocusId} thread={{title:"TEST THREAD"}} posts={this.getPostsOrHomepage()}   />
             </div>

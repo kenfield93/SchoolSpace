@@ -35,7 +35,7 @@ courseModel.getThreadPosts = (thrId) => {
         "INNER JOIN post AS p " +
         "ON p.thrId = usrThread.thrId " +
         "WHERE usrThread.thrId = $1 " +
-        "ORDER BY p.responseToPostId , p.postTime ;"
+        "ORDER BY p.responseToPostId DESC , p.postTime ;"
     ;
     return dbPool.preparedquery(sql, [thrId], function(err, result){
         return (err) ? false : result.rows;
