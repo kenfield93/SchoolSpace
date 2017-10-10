@@ -33,7 +33,13 @@ const styles = {
 class MainDisplay extends React.Component{
     constructor(props){
         super(props);
+        this.state={
+            postText: '',
+            responsetoid: null
+        };
 
+        this.onPostTextChange = ((txt) => {  this.setState({postText: txt.target.value});}).bind(this);
+        this.submitPost = this.submitPost.bind(this);
     }
 
     postsArrayToMapOnResponseIdOrderedByTimestamp(posts){
@@ -49,6 +55,8 @@ class MainDisplay extends React.Component{
               postChain.push(post);
             }
         }
+        console.log("MAP");
+        console.log(m);
         return m;
     }
 
@@ -66,25 +74,50 @@ class MainDisplay extends React.Component{
         while( !(itrVal = levelMapIterator.next()).done){
             sameLevelPosts = itrVal.value[VALUE];
             level = itrVal.value[KEY];
+
             sameLevelPosts.forEach( post => {
-                divObj = new DivNode(post);
+
+                divObj = divMap.get(post.id) || new DivNode(post); // see if dumby already exists, if so use that first
                 if(filterFunc && typeof filterFunc === 'function' && filterFunc(post, level))
                     filteredDivs.push(divObj);
                 if (!this.isPostTopLevel(level)) {
+                    // node to chain to hasn't been created yet so make dummy
+                    if(divMap.get(level) === undefined)
+                        divMap.set(level, new DivNode(null));
                     divMap.get(level).connect(divObj);
                 }
-                divMap.set(post.id, divObj);
+                if(divMap.get(post.id) !== undefined) { // if dumby was made a node will already exist in that bucket
+                    divMap.get(post.id).initPost(post); // so init note w/ actual post data
+                    divObj = null;
+                }
+                else {
+                    divMap.set(post.id, divObj);
+                }
             });
         }
         return filteredDivs;
     }
 
+    submitPost(event){
+        event.preventDefault();
+        const post = {};
+        post.text = this.state.postText;
+        post.responsetoid = 2;
+        post.threadId = this.props.threadId;
+        this.props.createPost(post);
+        this.setState({postText: ''});
+    }
+
     render() {
         return (
             <div style={styles.container}>
-                {this.props.thread.title}
+                <form method="post" onSubmit={this.submitPost} >
+                    <label htmlFor="post" />
+                    <textarea type="text" value={this.state.postText} onChange={this.onPostTextChange}name="post"/>
+                    <button type="submit"> Submit </button>
+                </form>
+                { (this.props.thread) ? this.props.thread.title : ''}
                 <ul>
-                    <li> </li>
                     {this.postsToDivMapOnId(this.props.posts, (post, key) => key === null).map(divLinkedList => {
                         let padding = -20;
                         return divLinkedList.getDivChain().map(div => {

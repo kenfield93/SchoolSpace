@@ -139,7 +139,7 @@ const post = () => {
         " postText text NOT NULL CHECK(length(postText)>1), " +
         " responseToPostId INTEGER REFERENCES post(postId), " +
         " postTime timestamp DEFAULT current_timestamp " +
-        " likeCnt INTEGER ); "
+        " likeCnt INTEGER DEFAULT 0); "
     );
 };
 

@@ -56,5 +56,30 @@ export default function (Router){
             res.status(500).send([]); });
 
     });
+    function isPostPostsInputValid(body){
+        if(!body) return false;
+        if(body.usrId === null || body.usrId === undefined || isNaN(body.usrId) || body.usrId < 0 )
+            return false;
+        if(body.threadId === null || body.threadId === undefined || isNaN(body.threadId) || body.threadId < 0 )
+            return false;
+        if(  body.responseToId === undefined || isNaN(body.responseToId) || body.responseToId < 0 )
+            return false;
+        if(body.text === null || body.text === undefined || body.text.length < 1)
+            return false;
+        return true;
+    }
+    Router.post('/posts', function(req,res,next){
+        req.body.usrId = 6;
+        if(!isPostPostsInputValid(req.body))
+            return res.status(422).send("Error: Improper inputs");
+        courseModel.createPost(req.body)
+            .then( result => {
+                res.status(200).send(true);
+            }).catch(err => {
+                res.status(500).send(false)
+        });
+
+    });
+
     return Router;
 }

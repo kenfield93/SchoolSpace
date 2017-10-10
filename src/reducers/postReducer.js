@@ -13,6 +13,12 @@ export default function (state = initialState.posts, action ) {
             return dictCopy;
         case types.LOAD_THREAD_POSTS_FAILURE:
             return state;
+        case types.CREATE_POST_SUCCESS:
+            dictCopy = Object.assign({}, state);
+            dictCopy[action.payload.threadId] = [action.payload.post].concat(dictCopy[action.payload.threadId]);
+            return dictCopy;
+        case types.CREATE_POST_FAILURE:
+            return state;
 
         default:
             return state;

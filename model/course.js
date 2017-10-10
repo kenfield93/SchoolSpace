@@ -5,7 +5,7 @@
 const courseModel = {};
 import dbPool from './database';
 const loginInfoTable = 'login';
-const userTable = 'users';
+const users = 'users';
 const userToClassTable = 'usertoclass';
 const courses = 'class';
 const threads = 'thread';
@@ -31,11 +31,11 @@ courseModel.getThreadPosts = (thrId) => {
     var sql =
         "SELECT tp.id, text, responseToPostId, postTime, likeCnt, name " +
         "FROM ( SELECT p.usrId AS usrId, p.responseToPostId, p.postText as text, p.postId as id, p.postTime, p.likeCnt " +
-        "FROM post p INNER JOIN thread t " +
+        `FROM ${posts} p INNER JOIN ${threads} t ` +
         "ON p.thrId = t.thrId " +
         "WHERE p.thrId = $1 " +
         ") AS tp " +
-        "INNER JOIN users u " +
+        `INNER JOIN ${users} u ` +
         "ON u.usrId = tp.usrId " +
         "ORDER BY tp.responseToPostId DESC, tp.postTime ; "
     ;
@@ -60,6 +60,17 @@ courseModel.getThreads = (classId) => {
 
     return dbPool.preparedquery(sql, [classId], function(err, result){
        return (err) ? false : result.rows;
+    });
+};
+
+courseModel.createPost = ({usrId, threadId, responseToId, text}) => {
+    var sql =
+        `INSERT INTO ${posts} (usrId, thrId, responsetopostid, postText) ` +
+        " VALUES ($1, $2, $3, $4) ;"
+    ;
+
+    return dbPool.preparedquery(sql, [usrId, threadId, responseToId, text], function(err, result){
+       return !!err;
     });
 };
 

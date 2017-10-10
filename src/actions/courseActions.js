@@ -17,13 +17,16 @@ export function loadCourseThreadsFailure(err){
     return {type: types.LOAD_COURSE_THREADS_FAILURE, err};
 }
 export function loadPostsSuccess(posts, threadId){
-    console.log('loadPostSuccess');
-    console.log("threadId %s", threadId);
-   // threadId = 1;
     return {type: types.LOAD_THREAD_POSTS_SUCCESS, payload: {threadId, posts}};
 }
 export function loadPostsFailure(err){
     return {type: types.LOAD_THREAD_POSTS_FAILURE, err};
+}
+export function createPostSuccess(post, threadId){
+    return {type: types.CREATE_POST_SUCCESS, payload: {threadId, post}};
+}
+export function createPostFailure(err){
+    return {type: types.CREATE_POST_FAILURE, err};
 }
 /* thunks */
 
@@ -64,5 +67,22 @@ export function loadPostsByThread(threadId){
                 dispatch(loadPostsFailure(err));
                 return Promise.reject(err);
             });
+    };
+}
+
+export function createPost(newPost){
+    return function(dispatch){
+        if(!newPost) return Promise.reject('newPost must be valid');
+        const threadId = newPost.threadId, responseToId = newPost.responsetoid, text = newPost.text;
+        dispatch(startAjaxCall());
+        return axios.post(`http://${config.host}:${config.port}/v1/posts`, {
+            threadId, responseToId, text
+        })
+        .then(didPost => {
+            dispatch(createPostSuccess(newPost, threadId));
+        }).catch(err => {
+            dispatch(createPostFailure(err));
+            return Promise.reject(err);
+        });
     };
 }

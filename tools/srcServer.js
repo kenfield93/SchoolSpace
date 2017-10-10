@@ -29,6 +29,8 @@ app.use(require('webpack-dev-middleware')(compiler, {
 }));
 
 app.use(require('webpack-hot-middleware')(compiler));
+console.log("BYAYAYA");
+console.log(bodyparser);
 app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({extended: true}));
 

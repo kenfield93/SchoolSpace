@@ -56,7 +56,9 @@ class CoursePage extends React.Component{
         return (
             <div className="container" style={styles.wrapper}>
                     <ThreadDirectory threads={this.props.threads} searchAction={this.onSearchTermChange} setThreadFocus={this.setThreadFocus}/>
-                    <MainDisplay threadId={this.state.threadFocusId} thread={{title:"TEST THREAD"}} posts={this.getPostsOrHomepage()}   />
+                    <MainDisplay createPost={this.props.actions.createPost} threadId={this.state.threadFocusId}
+                                 thread={this.props.threads.find(e => e.id === this.state.threadFocusId)}
+                                 posts={this.getPostsOrHomepage()}    />
             </div>
 
         );
@@ -81,11 +83,13 @@ function mapDispatchToProps(dispatch, ownProps){
     const courseId = ownProps.params.id;
     const loadThreads = () => dispatch(courseAction.loadCourseThreads(courseId));
     const loadPostsFromDB = (id=-1) => dispatch(courseAction.loadPostsByThread(id));
+    const createPost = (post) => dispatch(courseAction.createPost(post));
     loadThreads();
     return{
         actions:{
             loadThreads,
-            loadPosts: loadPostsFromDB
+            loadPosts: loadPostsFromDB,
+            createPost
         }
     };
 }
