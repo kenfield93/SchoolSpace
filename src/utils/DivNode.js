@@ -13,7 +13,7 @@ class DivNode{
     }
     getDiv(padding){
         return(
-          <div>
+          <div id={this.post.id}>
              <p style={{paddingLeft: padding || 0}}key={this.post.id}>{this.post.name}:{this.post.text} </p>
               <button > reply </button>
               <br/>
@@ -23,8 +23,7 @@ class DivNode{
     initPost(post){
         this.post = post;
     }
-    //Node getting every layer. Need something like treating the node as a tree w/ this as root and printing
-    // out divs in breadth first
+
     getDivChain(){
         const list = [this];
         let ptr = this.next;
