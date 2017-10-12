@@ -8,6 +8,12 @@ export default {
     debug: true,
     devtool: 'inline-source-map',
     noInfo: false,
+    resolve: {
+        modules: [
+            path.resolve('./src'),
+            path.resolve('./node_modules')
+        ]
+    },
     entry: [
         'eventsource-polyfill', // necessary for hot reloading with IE
         'webpack-hot-middleware/client?reload=true', //note that it reloads the page if hot module reloading fails.

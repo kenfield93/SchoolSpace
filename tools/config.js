@@ -12,11 +12,10 @@ const dbConfig = {
 };
 const dbConnectionString =  process.env.DATABASE_URL || 'postgres://' + dbConfig.host + ':' + dbConfig.port + '/' + dbConfig.database;
 
-
 module.exports = {
     port: process.env.PORT || 9000,
     host: process.env.HOST || 'localhost',
     dbConfig,
     dbConnectionString
- };
+};
 

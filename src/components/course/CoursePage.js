@@ -17,8 +17,6 @@ const styles = {
         //textAlign: 'left', /* Resetting the text alignment */
        // verticalAlign: 'top' /* Making sure inline-block element align to the top */
     }
-
-
 };
 
 class CoursePage extends React.Component{
@@ -32,19 +30,19 @@ class CoursePage extends React.Component{
             return posts[thrid];
         }).bind(this);
     }
-    //Todo: thing about putting this in redux store since multiple commonents might wanna use it
-    setThreadFocus(id, fn){
-        this.setState({threadFocusId: id}, () => {
-             if(fn && typeof fn === 'function')
-                fn(this.state.threadFocusId);
-        });
-    }
 
     componentWillUpdate(nextProps, nextState){
         if(!this.getPostsFromMemStore(nextProps.posts, nextState.threadFocusId)) {
                 this.props.actions.loadPosts(nextState.threadFocusId);
             }
+    }
 
+    //Todo: thing about putting this in redux store since multiple commonents might wanna use it
+    setThreadFocus(id, fn){
+        this.setState({threadFocusId: id}, () => {
+            if(fn && typeof fn === 'function')
+                fn(this.state.threadFocusId);
+        });
     }
 
     defaultDisplay(){ return [];}
@@ -58,12 +56,10 @@ class CoursePage extends React.Component{
                     <ThreadDirectory threads={this.props.threads} searchAction={this.onSearchTermChange} setThreadFocus={this.setThreadFocus}/>
                     <MainDisplay createPost={this.props.actions.createPost} threadId={this.state.threadFocusId}
                                  thread={this.props.threads.find(e => e.id === this.state.threadFocusId)}
-                                 posts={this.getPostsOrHomepage()}    />
+                                 posts={this.getPostsOrHomepage()} userName={this.props.userName}    />
             </div>
-
         );
     }
-
 }
 
 CoursePage.propTypes = {
@@ -71,11 +67,11 @@ CoursePage.propTypes = {
 };
 
 function mapStateToProps(state, ownProps){
-
     let posts = {};
     return{
         posts: state.posts? state.posts : {},
-        threads:  state.threads? state.threads : []
+        threads:  state.threads? state.threads : [],
+        userName: "Kyle Enfield"
     };
 }
 

@@ -11,6 +11,9 @@ const courses = 'class';
 const threads = 'thread';
 const posts = 'post';
 
+const postIdAlias = 'id';
+const postTextAlias = 'text';
+
 courseModel.createCourse = (orgId, title, ssId) => {
     let ssIdLabelSql = "", ssIdValueSql = "";
     if(ssId){
@@ -66,11 +69,11 @@ courseModel.getThreads = (classId) => {
 courseModel.createPost = ({usrId, threadId, responseToId, text}) => {
     var sql =
         `INSERT INTO ${posts} (usrId, thrId, responsetopostid, postText) ` +
-        " VALUES ($1, $2, $3, $4) ;"
+        ` VALUES ($1, $2, $3, $4) RETURNING postId AS ${postIdAlias} , postText AS ${postTextAlias}, responseToPostId, postTime, likeCnt, null AS name ;`
     ;
 
     return dbPool.preparedquery(sql, [usrId, threadId, responseToId, text], function(err, result){
-       return !!err;
+       return (err) ? false : result.rows[0];
     });
 };
 

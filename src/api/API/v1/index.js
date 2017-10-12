@@ -74,9 +74,9 @@ export default function (Router){
             return res.status(422).send("Error: Improper inputs");
         courseModel.createPost(req.body)
             .then( result => {
-                res.status(200).send(true);
+                res.status(200).send(result);
             }).catch(err => {
-                res.status(500).send(false)
+                res.status(500).send(false);
         });
 
     });

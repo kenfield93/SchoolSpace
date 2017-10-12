@@ -1,5 +1,4 @@
 import types from './actionTypes';
-import courseAPI from '../api/mockAPI/classAPI';
 import {startAjaxCall} from './ajaxStatusAction';
 import config from '../../tools/config';
 import axios from 'axios';
@@ -78,8 +77,8 @@ export function createPost(newPost){
         return axios.post(`http://${config.host}:${config.port}/v1/posts`, {
             threadId, responseToId, text
         })
-        .then(didPost => {
-            dispatch(createPostSuccess(newPost, threadId));
+        .then(createdPost => {
+            dispatch(createPostSuccess(createdPost.data, threadId));
         }).catch(err => {
             dispatch(createPostFailure(err));
             return Promise.reject(err);

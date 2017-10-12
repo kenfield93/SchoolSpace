@@ -22,8 +22,8 @@
   },
   "scripts": {
     "prestart": "babel-node tools/startMessage.js",
-    "start": "npm-run-all --parallel open:src lint:watch test:watch",
-    "open:src": "babel-node tools/srcServer.js",
+    "start": " NODE_PATH=./src npm-run-all --parallel open:src lint:watch test:watch",
+    "open:src": "babel-node src/srcServer.js",
     "lintComment": "node_modules/.bin/esw is path to binary eslint watcher, then tells it to watch webpack.config.*, src, and tool",
     "lint": "node_modules/.bin/esw webpack.config.* src tools",
     "lint:watchComment": "lint:watch tells it to actual watch files. lets us pass watch flag to es lint watch",
