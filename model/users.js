@@ -34,7 +34,7 @@ userModel.getUsersFromClass = (cId, ssId) => {
  */
 
 
-userModel.insertUser = (email, name, salt, password) => {
+userModel.insertUser = ({email, name, salt, password}) => {
     //Note I think pg node lib doesn't let you rereference a $ variable more than once for some reason, so pass email twice
     const sql =
     " BEGIN;" +
@@ -47,6 +47,27 @@ userModel.insertUser = (email, name, salt, password) => {
             return false;
         }
         return true;
+    });
+};
+
+userModel.getUserLoginInfo = (email) => {
+    const sql =
+        `SELECT * FROM ${loginInfoTable} WHERE $1 = email; `
+    ;
+    return dbPool.preparedquery(sql, [email], (err, result) => {
+       if(err) return false;
+       return result.rows[0];
+    });
+};
+
+userModel.getUserAccountInfo = (email) => {
+    const sql =
+        "SELECT teaid as isTeacher, stuid as isStudent, name " +
+        ` FROM ${userTable} WHERE $1 = email; `
+    ;
+    return dbPool.preparedquery(sql, [email], (err, result) => {
+         if(err) return false;
+         return result.rows[0];
     });
 };
 

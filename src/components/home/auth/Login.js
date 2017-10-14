@@ -3,28 +3,51 @@
  */
 import React, {PropTypes} from 'react';
 import ErrorMsg from '../../common/ErrorMsg';
+import TextEmailInput from '../../common/TextInput';
 
-const Login = (props) =>{
+class Login extends React.Component{
+    constructor(props){
+        super(props);
+        this.state = {
+            email: '',
+            password: ''
+        };
+        this.onLogin = this.onLogin.bind(this);
+        this.onFieldChange = this.onFieldChange.bind(this);
+    }
 
-    return(
-       <div>
-           <label htmlFor="email" />
-           <input type="email" name="email" placeholder="email"/>
-           <label htmlFor="password" />
-           <input type="password" name="password" placeholder="password"/>
-           <label htmlFor="login" />
-           <input type="submit" name="login"
-                  value="Login"
-                  onClick={props.onLogin} />
-           <ErrorMsg err={props.loginStatus}/>
-       </div>
-    );
-};
+    onFieldChange(event){
+        const stateField = event.target.name;
+        const value = event.target.value;
+        const o = {};
+        o[stateField] = value;
+        this.setState(o);
+    }
 
+    onLogin(event){
+        this.props.userLoginAction(this.state.email, this.state.password);
+    }
+
+    render() {
+        return (
+            <div>
+                <TextEmailInput name="email" type="email" placeholder="email:" value={this.email}
+                                onChange={this.onFieldChange} />
+                <TextEmailInput name="password" type="password" placeholder="password:" value={this.password}
+                                onChange={this.onFieldChange} />
+                <label htmlFor="login"/>
+                <input type="submit" name="login"
+                       value="Login"
+                       onClick={this.onLogin}/>
+                <ErrorMsg err={this.props.loginStatus}/>
+            </div>
+        );
+    }
+}
 
 
 Login.propTypes = {
-    onLogin: PropTypes.func.isRequired,
+    userLoginAction: PropTypes.func.isRequired,
     loginStatus: PropTypes.object.isRequired
 };
 

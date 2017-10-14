@@ -35,7 +35,6 @@ class MainDisplay extends React.Component{
         super(props);
         this.state={
             postText: '',
-            responsetoid: null,
             parentOfNewPost: null
         };
 
@@ -55,7 +54,7 @@ class MainDisplay extends React.Component{
      *                rather than post.id mapping to responsetopostid
      * The point of this is so that we can basically do DFS from each Top Level Comment down to their 'leaf' comments
      */
-    mapOfPostsToDirectResponders(posts){
+    static mapOfPostsToDirectResponders(posts){
         const dict = new Map();
         let id;
         let parentid;
@@ -75,7 +74,7 @@ class MainDisplay extends React.Component{
      * @returns {arrayOf({post, level})} Representing the order in which the posts should be printed out, and
      *                                    their level or indention factor
      */
-    getPrintPostInfo( parentToChild){
+    static getPrintPostInfo( parentToChild){
         let key = null;
         const printOrder = [];
 
@@ -103,18 +102,17 @@ class MainDisplay extends React.Component{
     }
     submitTopLevelPost(text){
             this.setState({parentOfNewPost:null}, () =>{
-                this.submitReplyPost(text)
+                this.submitReplyPost(text);
             });
-    };
+    }
 
-    // refactor into open/close commentForm
     toggleOpenCommentForm( parentPostId=null){
         this.setState((prevState, props)=>{
             if(prevState.parentOfNewPost == parentPostId){
-                return {parentOfNewPost: null}
+                return {parentOfNewPost: null};
             }
             else{
-                return {parentOfNewPost: parentPostId}
+                return {parentOfNewPost: parentPostId};
             }
         });
     }
@@ -125,13 +123,13 @@ class MainDisplay extends React.Component{
      * @returns {arrayOf(divs)} Where each div represents a row in the thread w/ comment info and reply_btn/reply form
      */
     printComments(posts){
-        return this.getPrintPostInfo(this.mapOfPostsToDirectResponders(this.props.posts)).map((postPaddingPair) => {
+        return MainDisplay.getPrintPostInfo(MainDisplay.mapOfPostsToDirectResponders(this.props.posts)).map((postPaddingPair) => {
             const post = postPaddingPair.order;
             const padding = postPaddingPair.level;
 
             return(
-                <div>
-                    <Comment key={post.id} toggleOpenCommentForm={this.toggleOpenCommentForm} indentLevel={padding}
+                <div  key={post.id}>
+                    <Comment  toggleOpenCommentForm={this.toggleOpenCommentForm} indentLevel={padding}
                              paddingMultiplier={20} post={post} defaultPosterName={this.props.userName}
                     />
                     <CommentForm display={this.state.parentOfNewPost == post.id}

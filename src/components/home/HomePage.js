@@ -2,9 +2,11 @@
  * Created by kyle on 9/18/17.
  */
 import React from 'react';
+import {connect} from 'react-redux';
 import {browserHistory, Link} from 'react-router';
 import Login from './auth/Login';
 import Signup from './auth/Signup';
+import * as userAction from '../../actions/userAction';
 
 /*TODO right now signup/login info are in url like get req, try doing non form way for that */
 class HomePage extends React.Component {
@@ -15,27 +17,25 @@ class HomePage extends React.Component {
             loginStatus: null,
             signupStatus: null
         };
-        this.onLogin = this.onLogin.bind(this);
+        this.loginUser = this.loginUser.bind(this);
         this.onSignup = this.onSignup.bind(this);
     }
-    onLogin(event){
+    loginUser(email, password){
 
-
-        /*const coinFlip = Math.floor(Math.random() * 10)+1;
-        if(coinFlip  % 2 === 0){
-            if(coinFlip >=5 )
-                this.setState({loginStatus:{msg: "Too many login attempts"}});
-            else
-                this.setState({loginStatus:{msg: "Incorrect Username AND/OR password"}});
-        }
-        else{
-*/
-            browserHistory.push('/classDirectory');
+            this.props.login(email,password)
+                .then(result => {
+                    browserHistory.push('/classDirectory');
+                }).catch( err => {
+                this.setState({loginStatus: "Incorrect Email and/or Password"});
+            });
 
         //}
     }
 
-    onSignup(event){
+    onSignup(signUpInfo){
+
+        event.preventDefault();
+
 
     }
     render(){
@@ -43,7 +43,7 @@ class HomePage extends React.Component {
             <div className="jumbotron">
                 <h1>Welcome to School Space!</h1>
                 <p> Written in ES6 using Node.js, Express.js, PSQL, React, Redux, and React Router </p>
-                <Login onLogin={this.onLogin} loginStatus={this.state.loginStatus} />
+                <Login userLoginAction={this.loginUser} loginStatus={this.state.loginStatus} />
                 <br/>
                 <Link to="about" className="btn btn-primary btn-lg">Learn More</Link>
                 <br /><br /><br /><br />
@@ -54,4 +54,12 @@ class HomePage extends React.Component {
     }
 }
 
-export default  HomePage;
+function mapStateToProps(state, ownProps){
+   return{}
+}
+function mapDispatchToProps(dispatch, ownProps){
+    const login = (email,password) =>  dispatch(userAction.loginUser(email, password));
+    return {login};
+}
+
+export default connect(mapStateToProps, mapDispatchToProps) (HomePage);

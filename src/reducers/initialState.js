@@ -7,5 +7,6 @@ export default {
     userCourses: [],
     threads: null,
     posts: {'-1': []},
+    user: {authToken: null, accessToken: null, name: '', email: ''},
     numAjaxCallsInProgress: 0
 };

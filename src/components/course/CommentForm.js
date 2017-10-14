@@ -4,7 +4,6 @@
 import React from 'react';
 
 class CommentForm extends React.Component{
-
     constructor(props){
         super(props);
         this.state={
@@ -19,7 +18,6 @@ class CommentForm extends React.Component{
         const text = this.state.postText;
         this.props.createPost(text);
         this.setState({postText: ''});
-
     }
     render(){
         if( this.props.display)
@@ -33,5 +31,4 @@ class CommentForm extends React.Component{
         return null;
     }
 }
-
 export default CommentForm;

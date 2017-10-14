@@ -2,13 +2,14 @@
  * Created by kyle on 10/8/17.
  */
 import React from 'react';
+
 class Comment extends  React.Component{
     constructor(props){
         super(props);
-
-        this.callOpenStreamOnClick = this.callOpenStreamOnClick.bind(this);
+        this.toggleCommentStreamOnClick = this.toggleCommentStreamOnClick.bind(this);
     }
-    callOpenStreamOnClick(event){
+
+    toggleCommentStreamOnClick(event){
         this.props.toggleOpenCommentForm(this.props.post.id);
     }
 
@@ -18,12 +19,10 @@ class Comment extends  React.Component{
         return(
           <div style={{borderColor: 'blue', borderStyle: 'solid', paddingLeft: this.props.indentLevel * this.props.paddingMultiplier}} >
              <p >{this.props.post.name || this.props.defaultPosterName}:{this.props.post.text} </p>
-              <button onClick={this.callOpenStreamOnClick}> reply </button>
+              <button onClick={this.toggleCommentStreamOnClick}> reply </button>
               <br/>
           </div>
         );
     }
-
 }
-
 export default Comment;

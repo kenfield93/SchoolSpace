@@ -82,11 +82,12 @@ const users = () => {
     );
 };
 
+//TODO as of now user can have multiple valid passwords since email isn't unique
 const login = () => {
 
     return (
         "CREATE TABLE login( " +
-        " email TEXT REFERENCES users(email), " +
+        " email TEXT REFERENCES users(email) NOT NULL, " +
         " salt TEXT NOT NULL CHECK(length(salt) >= 6), " +
         " password TEXT NOT NULL CHECK(length(password) >= 8) );"
     );

@@ -4,6 +4,8 @@
 import userModel from '../../../../model/users';
 import courseModel from '../../../../model/course';
 
+const minSaltSize = 6;
+const minEmailSize = 5;
 //TODO extract the api logic out to a controller folder
 //TODO set up middleware for non fatal errors? like if we call next() from a func it should go to that error next
 export default function (Router){
@@ -80,6 +82,87 @@ export default function (Router){
         });
 
     });
+
+    Router.post('/login', function(req, res, next){
+        const loginInfo = req.body.loginInfo;
+        if(!loginInfo || !loginInfo.uniqueIdentifier || !loginInfo.password || loginInfo.password.length < 8)
+            return res.status(422).send("Error: Incorrect Signup info");
+        const email = loginInfo.uniqueIdentifier;
+        console.log("Hello bitch");
+        const loginInfoPromise = userModel.getUserLoginInfo(email)
+            .then( result => {
+                const pwd = encryptPassword(loginInfo.password, result.salt);
+                if( pwd === loginInfo.password) {
+                    const tokens = oAuth(email,pwd);
+                    return Promise.resolve({email, tokens});
+                }
+                return Promise.reject("Incorrect Login info");
+            }).catch(err => {
+                return err;
+            });
+
+        loginInfoPromise.then(info => {
+                userModel.getUserAccountInfo(info.email)
+                    .then(result => {
+                        let f = Object.assign({}, info);
+                        const user = Object.assign(Object.assign({}, info), result );
+                        console.log("NOTHINGS WROKING AND OUR FUTURES LOOKING BLEAK AND I SAY");
+                        console.log(user);
+                        res.status(200).send(user);
+                    })
+        }).catch(err => {
+            console.log("SHOULDN'T BE HERE");
+            console.log(err);
+           res.status(500).send(null);
+        });
+    });
+
+    //TODO can extract this validatoin out and then use it front end & backend
+    Router.post('/createUser', function(req, res, next){
+        const user = {},
+            info  = req.body.signupInfo;
+        if(!info)
+            return res.status(422).send("Error: Incorrect Signup info");
+        if(info.password !== info.confirmPassword ) {
+            return res.status(422).send("Error: Passwords don't match");
+        }
+        if(info.email.indexOf('@') || info.email.length <= minEmailSize){
+            return res.status(422).send("Error: Email Too short or not valid");
+        }
+        if(!info.name)
+            return res.status(422).send("Error: No nam");
+        // todo other password validation. No illegal characters, etc
+
+        user.salt = genSalt(user.password, minSaltSize);
+        user.password = encryptPassword(user.salt, info.password);
+        user.email = info.email;
+        user.name = info.name;
+
+        userModel.insertUser(user)
+            .then( result => {
+                res.status(200).send(user);
+            }).catch(err => {
+                res.status(500).send(err);
+        });
+
+    });
+    const genSalt = (str, minSaltLength) => {
+        minSaltLength = minSaltLength > str.length ? str.length : minSaltLength;
+        const salt = [];
+        let saltLen = 0;
+        while(saltLen < minSaltLength) {
+            salt.push(String.fromCharCode(salt.CharaMath.floor(Math.random() * 0xFFFF)));
+            saltLen++;
+        }
+        return salt.join('');
+    };
+    const encryptPassword = (psw, salt) => {
+        return psw;
+    };
+    const oAuth = (email, password) => {
+        return {authToken: 1, accessToken: 1};
+    };
+
 
     return Router;
 }
