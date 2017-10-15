@@ -4,10 +4,10 @@
 import React, {PropTypes} from 'react';
 
 const ErrorMsg = (props) => {
-    if(!props.err) return null;
+    if(!props.err || props.err.length < 1) return null;
     return (
         <div className="warning">
-            {props.err.msg}
+            {props.err}
         </div>
     );
 };

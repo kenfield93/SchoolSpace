@@ -25,15 +25,17 @@ class Login extends React.Component{
     }
 
     onLogin(event){
+        event.preventDefault();
         this.props.userLoginAction(this.state.email, this.state.password);
+        this.setState({email:'', password:''});
     }
 
     render() {
         return (
             <div>
-                <TextEmailInput name="email" type="email" placeholder="email:" value={this.email}
+                <TextEmailInput name="email" type="email" placeholder="email:" value={this.state.email}
                                 onChange={this.onFieldChange} />
-                <TextEmailInput name="password" type="password" placeholder="password:" value={this.password}
+                <TextEmailInput name="password" type="password" placeholder="password:" value={this.state.password}
                                 onChange={this.onFieldChange} />
                 <label htmlFor="login"/>
                 <input type="submit" name="login"

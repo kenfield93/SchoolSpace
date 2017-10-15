@@ -43,8 +43,6 @@ export function loginUser(uniqueIdentifier, password){
         dispatch(startAjaxCall());
         return axios.post(`http://${config.host}:${config.port}/v1/login`, {loginInfo: {uniqueIdentifier, password}})
             .then( resp => {
-                console.log("LoginUserAction");
-                console.log(resp.data);
                 dispatch(loginSuccess(resp.data));
             }).catch(err => {
                 dispatch(loginFailure(err));

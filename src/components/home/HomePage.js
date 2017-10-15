@@ -26,6 +26,7 @@ class HomePage extends React.Component {
                 .then(result => {
                     browserHistory.push('/classDirectory');
                 }).catch( err => {
+                alert("boop");
                 this.setState({loginStatus: "Incorrect Email and/or Password"});
             });
 
