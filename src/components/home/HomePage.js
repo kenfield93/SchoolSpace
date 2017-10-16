@@ -8,7 +8,7 @@ import Login from './auth/Login';
 import Signup from './auth/Signup';
 import * as userAction from '../../actions/userAction';
 
-/*TODO right now signup/login info are in url like get req, try doing non form way for that */
+
 class HomePage extends React.Component {
     /* might need to add context for redux, dont think i need redux for this though */
     constructor(props){
@@ -18,7 +18,7 @@ class HomePage extends React.Component {
             signupStatus: null
         };
         this.loginUser = this.loginUser.bind(this);
-        this.onSignup = this.onSignup.bind(this);
+        this.signupUser = this.signupUser.bind(this);
     }
     loginUser(email, password){
 
@@ -26,18 +26,18 @@ class HomePage extends React.Component {
                 .then(result => {
                     browserHistory.push('/classDirectory');
                 }).catch( err => {
-                alert("boop");
                 this.setState({loginStatus: "Incorrect Email and/or Password"});
             });
-
-        //}
     }
 
-    onSignup(signUpInfo){
+    signupUser(email, name, password, confirmPassword){
 
-        event.preventDefault();
-
-
+        this.props.signup({email, name, password, confirmPassword})
+            .then(result => {
+                this.loginUser(email, password);
+            }).catch( err => {
+                this.setState({signupStatus: err});
+        });
     }
     render(){
         return(
@@ -48,7 +48,7 @@ class HomePage extends React.Component {
                 <br/>
                 <Link to="about" className="btn btn-primary btn-lg">Learn More</Link>
                 <br /><br /><br /><br />
-                <Signup onSignup={this.onSignup} signupStatus={this.state.signupStatus} />
+                <Signup userSignupAction={this.signupUser} signupStatus={this.state.signupStatus} />
 
             </div>
         );
@@ -60,7 +60,8 @@ function mapStateToProps(state, ownProps){
 }
 function mapDispatchToProps(dispatch, ownProps){
     const login = (email,password) =>  dispatch(userAction.loginUser(email, password));
-    return {login};
+    const signup = (signupInfo ) => dispatch(userAction.createUser(signupInfo));
+    return {login, signup};
 }
 
 export default connect(mapStateToProps, mapDispatchToProps) (HomePage);

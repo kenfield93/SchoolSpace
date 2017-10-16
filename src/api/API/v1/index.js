@@ -83,12 +83,23 @@ export default function (Router){
 
     });
 
+    /* Input: {uniqueIdentifier: str, password: str}
+       Output:
+       On success returns
+       {
+        name: str
+        teaId: int/null
+        stdId: int/null
+        email: str
+        tokens: { authToken: str, accessToken: str}
+       }
+     */
     Router.post('/login', function(req, res, next){
         const loginInfo = req.body.loginInfo;
         if(!loginInfo || !loginInfo.uniqueIdentifier || !loginInfo.password || loginInfo.password.length < 8)
             return res.status(422).send("Error: Incorrect Signup info");
+
         const email = loginInfo.uniqueIdentifier;
-        console.log("Hello bitch");
         const loginInfoPromise = userModel.getUserLoginInfo(email)
             .then( result => {
                 const pwd = encryptPassword(loginInfo.password, result.salt);
@@ -104,43 +115,50 @@ export default function (Router){
         loginInfoPromise.then(info => {
                 userModel.getUserAccountInfo(info.email)
                     .then(result => {
-                        let f = Object.assign({}, info);
                         const user = Object.assign(Object.assign({}, info), result );
-                        console.log("NOTHINGS WROKING AND OUR FUTURES LOOKING BLEAK AND I SAY");
-                        console.log(user);
                         res.status(200).send(user);
                     })
         }).catch(err => {
-            console.log("SHOULDN'T BE HERE");
-            console.log(err);
            res.status(500).send(null);
         });
     });
+    /* Input:
+     {
+     name: str
+     email: str
+     password: str
+     confirmPassword: str
+     }
+     Output:
+     On success returns true, else err
 
+     */
     //TODO can extract this validatoin out and then use it front end & backend
     Router.post('/createUser', function(req, res, next){
         const user = {},
             info  = req.body.signupInfo;
+        console.log("createUser");
+        console.log(info);
         if(!info)
             return res.status(422).send("Error: Incorrect Signup info");
         if(info.password !== info.confirmPassword ) {
             return res.status(422).send("Error: Passwords don't match");
         }
-        if(info.email.indexOf('@') || info.email.length <= minEmailSize){
+        if(info.email.indexOf('@') == -1 || info.email.length <= minEmailSize){
             return res.status(422).send("Error: Email Too short or not valid");
         }
         if(!info.name)
             return res.status(422).send("Error: No nam");
         // todo other password validation. No illegal characters, etc
 
-        user.salt = genSalt(user.password, minSaltSize);
-        user.password = encryptPassword(user.salt, info.password);
+        user.salt = genSalt(info.password, minSaltSize);
+        user.password = encryptPassword(info.password, user.salt);
         user.email = info.email;
         user.name = info.name;
 
         userModel.insertUser(user)
             .then( result => {
-                res.status(200).send(user);
+                res.status(200).send(true);
             }).catch(err => {
                 res.status(500).send(err);
         });
@@ -151,7 +169,7 @@ export default function (Router){
         const salt = [];
         let saltLen = 0;
         while(saltLen < minSaltLength) {
-            salt.push(String.fromCharCode(salt.CharaMath.floor(Math.random() * 0xFFFF)));
+            salt.push(String.fromCharCode((Math.floor(Math.random() * 0xFFF))));
             saltLen++;
         }
         return salt.join('');

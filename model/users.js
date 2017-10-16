@@ -98,7 +98,6 @@ userModel.getCourses = (userId) => {
     ;
     return dbPool.preparedquery(sql, [userId], (err, result) => {
        if(err || !result.rows[0]){
-           console.log("Y HAVE U FORSAKEn me");
            return false;
        }
        return result.rows;
