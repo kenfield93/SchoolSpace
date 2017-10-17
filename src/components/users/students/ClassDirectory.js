@@ -5,6 +5,7 @@ import React, {PropTypes} from 'react';
 import * as courseActions from '../../../actions/courseActions';
 import {connect} from 'react-redux';
 import CourseList from './CourseList';
+import CourseForm from '../instructors/CourseForm';
 
 class ClassDirectory extends React.Component{
     constructor(props){
@@ -25,6 +26,7 @@ class ClassDirectory extends React.Component{
         return(
             <div>
                 <h2> Class List</h2>
+                <CourseForm createNewCourse={this.props.createCourse}  />
                 <CourseList courses={this.props.courses}/>
             </div>
         );
@@ -42,8 +44,13 @@ function mapStateToProps(state){
 }
 function mapDispatchToProps(dispatch){
     dispatch(courseActions.loadUsersCourses());
+    const createCourse = (name, ssId) => {
+        //TODO get actual tokens to send
+        const tokens = {accessToken: ''};
+        return dispatch(courseActions.createCourse(name, ssId, tokens));
+    };
     return{
-
+        createCourse
     };
 }
 

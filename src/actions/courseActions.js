@@ -27,6 +27,12 @@ export function createPostSuccess(post, threadId){
 export function createPostFailure(err){
     return {type: types.CREATE_POST_FAILURE, err};
 }
+export function createCourseSuccess(course){
+    return {type: types.CREATE_COURSE_SUCCESS, course};
+}
+export function createCourseFailure(err){
+    return {type: types.CREATE_COURSE_FAILURE, err};
+}
 /* thunks */
 
 // backend would find out corresponding userId via OAuth or session or someshit
@@ -81,7 +87,21 @@ export function createPost(newPost){
             dispatch(createPostSuccess(createdPost.data, threadId));
         }).catch(err => {
             dispatch(createPostFailure(err));
-            return Promise.reject(err);
         });
+    };
+}
+
+export function createCourse(name, ssId, tokens){
+    return function(dispatch){
+        if(!tokens) return Promise.reject("Invalid authorization to create new course");
+        dispatch(startAjaxCall());
+        return axios.post(`http://${config.host}:${config.port}/v1/createCourse`, {
+            courseInfo: {name, ssId, tokens}
+        })
+        .then(createdCourse => {
+            dispatch(createCourseSuccess(createdCourse.data));
+        }).catch(err => {
+                dispatch(createCourseFailure(err));
+            });
     };
 }

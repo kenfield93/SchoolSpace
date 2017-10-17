@@ -14,18 +14,24 @@ const posts = 'post';
 const postIdAlias = 'id';
 const postTextAlias = 'text';
 
-courseModel.createCourse = (orgId, title, ssId) => {
+//Relys on Token Access Auth to ensure usrId is a taecher.
+courseModel.createCourse = ( title, usrId, ssId, orgId) => {
     let ssIdLabelSql = "", ssIdValueSql = "";
-    if(ssId){
+    if(!isNaN(ssId)){
         ssIdLabelSql = ", ssId ";
-        ssIdValueSql = ", $3";
+        ssIdValueSql = ", $4";
     }
     const sql =
-        `INSERT INTO ${courses} (orgId, title ${ssIdLabelSql} ) ` +
-        ` VALUES ( $1, $2 ${ssIdValueSql} ;) `
+        "WITH newClass as( " +
+        ` INSERT INTO ${courses} (orgId, classname ${ssIdLabelSql} ) ` +
+        ` VALUES ( $1, $2 ${ssIdValueSql}) ` +
+        " RETURNING classid ) " +
+
+        ` INSERT INTO ${userToClassTable} (usrid, classid) ` +
+        " VALUES ( $3, (SELECT classid from newClass)) RETURNING classid as courseId ; "
     ;
-    return dbPool.preparedquery(sql, [orgId, title, ssId], function(err, result){
-        return !!err;
+    return dbPool.preparedquery(sql, [orgId, title, usrId, (!isNaN(ssId)) ? ssId : null], function(err, result){
+        return (err) ?  false : result.rows[0];
     });
 };
 

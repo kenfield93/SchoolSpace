@@ -181,6 +181,45 @@ export default function (Router){
         return {authToken: 1, accessToken: 1};
     };
 
+    /****
+     * Inputer: { orgId: key/number, ssId: key/number, teaId name: string}
+     */
+    Router.post('/createCourse', function(req, res, next){
+        const newCourse = req.body.courseInfo;
+        const tokens = newCourse.tokens;
+        if(!tokens)
+            return res.status(400).send("Not authorized");
+        const userInfo = mapAccessTokenToUserInfo(tokens.accessToken);
+        newCourse.orgId = userInfo.orgId;
+        newCourse.usrId = userInfo.usrId;
+        //TODO either deduce/map/create orgId from tokens or use tokens to validate that org id is valid
+        if(!newCourse) {
+            return res.status(422).send("No course info specified");
+        }
+        if(isNaN(newCourse.orgId) || newCourse.orgId < 0 ) {
+            return res.status(422).send("Invalid  oganization");
+        }
+        if( isNaN(newCourse.ssId) || newCourse.ssId < 0) {
+            return res.status(422).send("Invalid  school session");
+        }
+        if(isNaN(newCourse.usrId) || newCourse.usrId < 0) {
+            return res.status(422).send("Invalid teacher ");
+        }
+        if(!newCourse.name || newCourse.name.trim().length < 3 ) {
+            return res.status(422).send("Course needs name with at least 3 characters");
+        }
+        courseModel.createCourse(newCourse.name, newCourse.usrId, newCourse.ssId, newCourse.orgId)
+            .then( result => {
+                res.status(200).send(result);
+            }).catch(err => {
+            res.status(500).send(err);
+        })
 
+
+    });
+
+    const mapAccessTokenToUserInfo = (token) => {
+        return {orgId:1, usrId:26}
+    };
     return Router;
 }

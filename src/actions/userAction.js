@@ -32,8 +32,6 @@ export function createUser(userInfo){
                 dispatch(createUserSuccess(user));
                 return user;
             }).catch( err => {
-               console.log("Heyyo Err = ");
-               console.log(err);
                 dispatch(createUserFailure(err));
                 return Promise.reject(err);
             });
