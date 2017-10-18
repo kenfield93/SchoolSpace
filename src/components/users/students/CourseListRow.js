@@ -8,7 +8,7 @@ const CourseListRow = ({course}) => {
     return(
         <tr>
             <td><Link to={'/course/' + course.classid}>{course.classname}</Link></td>
-            <td>{course.ssid}</td>
+            <td>{course.session}</td>
         </tr>
     );
 };

@@ -23,7 +23,7 @@ const SelectInput = ({name, label, allowMultiSelect=false, onChange, windowSize=
                 >
                     {optionValues.map((opt) => {
                         return(
-                                <option key={opt.value} value={opt.value}>{opt.name}</option>
+                                <option key={opt.value} value={opt.value}>{opt.display}</option>
                         );
                     })}
                 </select>

@@ -33,6 +33,15 @@ export function createCourseSuccess(course){
 export function createCourseFailure(err){
     return {type: types.CREATE_COURSE_FAILURE, err};
 }
+export function loadSchoolSessionsSuccess(sessions){
+    return {type: types.LOAD_SCHOOL_SESSIONS_SUCCESS, sessions};
+}
+export function loadSchoolSessionsFailure(err){
+    return {type: types.LOAD_SCHOOL_SESSIONS_FAILURE, err};
+}
+export function clearSchoolSessions(){
+    return {type: types.CLEAR_SCHOOL_SESSIONS};
+}
 /* thunks */
 
 // backend would find out corresponding userId via OAuth or session or someshit
@@ -90,6 +99,22 @@ export function createPost(newPost){
         });
     };
 }
+
+export function loadSchoolSessions(tokens){
+    return function(dispatch){
+        if(!tokens) return Promise.reject("Invalid authorization to get school sessions");
+        dispatch(startAjaxCall());
+        return axios.post(`http://${config.host}:${config.port}/v1/getSchoolSessions`, {
+                userInfo: {tokens}
+            })
+            .then(sessions => {
+                dispatch(loadSchoolSessionsSuccess(sessions.data));
+            }).catch(err => {
+                dispatch(loadSchoolSessionsFailure(err));
+            });
+    };
+}
+
 
 export function createCourse(name, ssId, tokens){
     return function(dispatch){

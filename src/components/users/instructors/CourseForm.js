@@ -25,12 +25,21 @@ class CourseForm extends React.Component{
         this.setState(o);
     }
     onSelectFieldChange(event){
+        console.log("poo");
+        alert('poo');
+        console.log(event.target.value);
         this.setState({schoolSession: event.target.value});
     }
 
     onCreateNewCourse(event){
         event.preventDefault();
         this.props.createNewCourse(this.state.name, this.state.schoolSession);
+    }
+    mapSchoolSessionsForSelectInput(schoolSessions){
+        if(!schoolSessions || schoolSessions.length == 0) return [];
+        return schoolSessions.map(e => {
+            return {value: e.ssid, display: e.session };}
+        );
     }
 
     render(){
@@ -42,7 +51,7 @@ class CourseForm extends React.Component{
                            value={this.state.name} onChange={this.onTextFieldChange}
                     />
 
-                <SelectInput name="name" optionValues={[{value:1, name:'spring-15'}, {value:2, name:'fall-16'}]}
+                <SelectInput name="name" optionValues={this.mapSchoolSessionsForSelectInput(this.props.schoolSessions)}
                              onChange={this.onSelectFieldChange}
                     />
                 <input type="submit" name="login"

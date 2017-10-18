@@ -5,6 +5,7 @@
 // maybe have element 0 of list or index 'default' of dict
 export default {
     userCourses: [],
+    schoolSessions: [],
     threads: null,
     posts: {'-1': []},
     user: {authToken: null, accessToken: null, name: '', email: ''},

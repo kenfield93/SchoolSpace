@@ -117,7 +117,7 @@ export default function (Router){
                     .then(result => {
                         const user = Object.assign(Object.assign({}, info), result );
                         res.status(200).send(user);
-                    })
+                    });
         }).catch(err => {
            res.status(500).send(null);
         });
@@ -186,9 +186,9 @@ export default function (Router){
      */
     Router.post('/createCourse', function(req, res, next){
         const newCourse = req.body.courseInfo;
-        const tokens = newCourse.tokens;
-        if(!tokens)
+        if(!newCourse || !newCourse.tokens)
             return res.status(400).send("Not authorized");
+        const tokens = newCourse.tokens;
         const userInfo = mapAccessTokenToUserInfo(tokens.accessToken);
         newCourse.orgId = userInfo.orgId;
         newCourse.usrId = userInfo.usrId;
@@ -213,13 +213,26 @@ export default function (Router){
                 res.status(200).send(result);
             }).catch(err => {
             res.status(500).send(err);
-        })
+        });
 
 
     });
 
+    Router.post('/getSchoolSessions', function(req, res, next){
+        const uI = req.body.userInfo;
+        if(!uI || !uI.tokens ) return res.status(401).send("Not authroized");
+        const tokens = uI.tokens;
+
+        const userInfo = mapAccessTokenToUserInfo(tokens.accessToken);
+        courseModel.loadSchoolSessions(userInfo.orgId)
+            .then( result => {
+                res.status(200).send(result);
+            }).catch(err => {
+            res.status(500).send(err);
+        });
+    });
     const mapAccessTokenToUserInfo = (token) => {
-        return {orgId:1, usrId:26}
+        return {orgId:1, usrId:26};
     };
     return Router;
 }

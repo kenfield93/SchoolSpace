@@ -22,11 +22,14 @@ const organization = () => {
          "email TEXT NOT NULL);"
     );
 };
+//not in BFNF since we have org here and in class which has org id and ssid. Since we aren't going to be altering orgId,
+// it should be fine. Only time we would delete is if we're deleting all corresponding data
 const schoolSession = () => {
     return(
         "CREATE TABLE schoolsession( " +
         "ssId SERIAL PRIMARY KEY, " +
         "name TEXT, " +
+        "orgId INTEGER NOT NULL REFERENCES organization(orgId) "  +
         "starttime TIMESTAMP );"
     );
 };

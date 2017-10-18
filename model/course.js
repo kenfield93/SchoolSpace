@@ -9,6 +9,7 @@ const users = 'users';
 const userToClassTable = 'usertoclass';
 const courses = 'class';
 const threads = 'thread';
+const schoolSessions = 'schoolsession';
 const posts = 'post';
 
 const postIdAlias = 'id';
@@ -35,7 +36,18 @@ courseModel.createCourse = ( title, usrId, ssId, orgId) => {
     });
 };
 
+courseModel.loadSchoolSessions = (orgId) => {
+    var sql =
+        "SELECT ssid, name as session " +
+        ` FROM ${schoolSessions} WHERE orgId = $1`
+    ;
 
+    return dbPool.preparedquery(sql, [orgId], function(err, result){
+        if( err || result.rows.length == 0)
+            return false;
+        return result.rows;
+    });
+};
 courseModel.getThreadPosts = (thrId) => {
     var sql =
         "SELECT tp.id, text, responseToPostId, postTime, likeCnt, name " +
