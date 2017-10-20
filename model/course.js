@@ -15,7 +15,21 @@ const posts = 'post';
 const postIdAlias = 'id';
 const postTextAlias = 'text';
 
-//Relys on Token Access Auth to ensure usrId is a taecher.
+courseModel.getCourses = (userId) => {
+    const sql =
+            " SELECT C.classid, classname, ssid " +
+            `FROM ${userToClassTable} as UtoC INNER JOIN ${courses} as C` +
+            " ON UtoC.classId = C.classId " +
+            " WHERE UtoC.usrId = $1"
+        ;
+    return dbPool.preparedquery(sql, [userId], (err, result) => {
+        if(err || !result.rows[0]){
+            return false;
+        }
+        return result.rows;
+    });
+};
+
 courseModel.createCourse = ( title, usrId, ssId, orgId) => {
     let ssIdLabelSql = "", ssIdValueSql = "";
     if(!isNaN(ssId)){
@@ -29,7 +43,7 @@ courseModel.createCourse = ( title, usrId, ssId, orgId) => {
         " RETURNING classid ) " +
 
         ` INSERT INTO ${userToClassTable} (usrid, classid) ` +
-        " VALUES ( $3, (SELECT classid from newClass)) RETURNING classid as courseId ; "
+        " VALUES ( $3, (SELECT classid from newClass)) RETURNING classid ; "
     ;
     return dbPool.preparedquery(sql, [orgId, title, usrId, (!isNaN(ssId)) ? ssId : null], function(err, result){
         return (err) ?  false : result.rows[0];
@@ -92,6 +106,16 @@ courseModel.createPost = ({usrId, threadId, responseToId, text}) => {
 
     return dbPool.preparedquery(sql, [usrId, threadId, responseToId, text], function(err, result){
        return (err) ? false : result.rows[0];
+    });
+};
+courseModel.editPost  = (userId, postId, text) => {
+    var sql =
+        `UPDATE ${posts} SET postText = $1 ` +
+        "WHERE userId = $2 AND postId = $3"
+    ;
+
+    return dbPool.preparedquery(sql, [text, userId, postId], function(err, result){
+         return (err) ? false : text
     });
 };
 

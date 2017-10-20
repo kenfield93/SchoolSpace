@@ -10,6 +10,10 @@ export default function courseReducer(state = initialState.userCourses, action){
             return Object.assign([], action.courses);
         case types.LOAD_COURSES_FAILURE:
             return state;
+        case types.CREATE_COURSE_SUCCESS:
+            return state.concat(action.course);
+        case types.CREATE_COURSE_FAILURE:
+            return state;
         default:
             return state;
     }

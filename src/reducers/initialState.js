@@ -8,6 +8,6 @@ export default {
     schoolSessions: [],
     threads: null,
     posts: {'-1': []},
-    user: {authToken: null, accessToken: null, name: '', email: ''},
+    user: {authToken: null, accessToken: null, name: '', email: '', isTeacher: false},
     numAjaxCallsInProgress: 0
 };

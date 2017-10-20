@@ -88,19 +88,5 @@ userModel.doesPasswordEmailValid = (email, password) => {
 
 };
 
-//todo move this to the class model or something
-userModel.getCourses = (userId) => {
-    const sql =
-        " SELECT * " +
-        `FROM ${userToClassTable} as UtoC INNER JOIN ${courses} as C` +
-        " ON UtoC.classId = C.classId " +
-        " WHERE UtoC.usrId = $1"
-    ;
-    return dbPool.preparedquery(sql, [userId], (err, result) => {
-       if(err || !result.rows[0]){
-           return false;
-       }
-       return result.rows;
-    });
-};
+
 export default userModel;

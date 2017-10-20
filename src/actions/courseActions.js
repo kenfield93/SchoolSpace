@@ -45,10 +45,11 @@ export function clearSchoolSessions(){
 /* thunks */
 
 // backend would find out corresponding userId via OAuth or session or someshit
-export function loadUsersCourses(){
+export function loadUsersCourses(tokens){
     return function(dispatch){
+        if(!tokens) return Promise.reject("Invalid authorization to create new course");
         dispatch(startAjaxCall());
-        return axios.get(`http://${config.host}:${config.port}/v1/courses`)
+        return axios.post(`http://${config.host}:${config.port}/v1/courses`, {userInfo: {tokens}})
             .then(courses => {
                 dispatch(loadUsersCoursesSuccess(courses.data));
             }, err => {

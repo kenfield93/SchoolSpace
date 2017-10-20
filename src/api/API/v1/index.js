@@ -3,6 +3,7 @@
  */
 import userModel from '../../../../model/users';
 import courseModel from '../../../../model/course';
+import * as courseAPI from './coursesAPI';
 
 const minSaltSize = 6;
 const minEmailSize = 5;
@@ -12,14 +13,28 @@ export default function (Router){
 
     //Can set middleware for router to do things like log api usage, authenticate, etc..
 
-    //not userId should id or signature should be attatched to req.param set from above middleware
-    Router.get('/courses', function(req, res, next){
-        userModel.getCourses(6)
-            .then(result => {
-                res.status(200).send(result);
-            }).catch(err => {  res.status(500).send([]);});
+    Router.post('/courses', function(req, res, next){
+        const uI = req.body.userInfo;
+        if(!uI || !uI.tokens ) return res.status(401).send("Not authroized");
+        const tokens = uI.tokens;
+        const userInfo = mapAccessTokenToUserInfo(tokens.accessToken);
+
+        courseAPI.getCourses( res, userInfo.usrId);
     });
 
+    /****
+     * Inputer: { orgId: key/number, ssId: key/number, teaId name: string}
+     */
+    Router.post('/createCourse', function(req, res, next){
+        const newCourse = req.body.courseInfo;
+        if(!newCourse || !newCourse.tokens)
+            return res.status(400).send("No course info specified: Not authorized");
+        const tokens = newCourse.tokens;
+        const userInfo = mapAccessTokenToUserInfo(tokens.accessToken);
+
+        courseAPI.createCourse(res, userInfo.orgId, userInfo.usrId, newCourse.title, newCourse.ssId)
+    });
+/*
     Router.post('/courses', function(req, res, next){
         const newCourse = req.body.course;
         if(!newCourse || !newCourse.orgId || !newCourse.title)
@@ -28,6 +43,7 @@ export default function (Router){
         const {orgId, title, ssid} = newCourse;
         courseModel.createCourse(orgId, title, ssid);
     });
+    */
 
     /* Probably need to seperate each 'keyword' ex courses, threads, etc into own router to use Router.param to auth operation
        Router.param is good for auth because it'll run regardless of Router.METHOD used
@@ -100,6 +116,7 @@ export default function (Router){
             return res.status(422).send("Error: Incorrect Signup info");
 
         const email = loginInfo.uniqueIdentifier;
+
         const loginInfoPromise = userModel.getUserLoginInfo(email)
             .then( result => {
                 const pwd = encryptPassword(loginInfo.password, result.salt);
@@ -116,6 +133,8 @@ export default function (Router){
                 userModel.getUserAccountInfo(info.email)
                     .then(result => {
                         const user = Object.assign(Object.assign({}, info), result );
+                        user.isTeacher = !!user.isteacher;
+                        user.isStudent = !!user.isstudent;
                         res.status(200).send(user);
                     });
         }).catch(err => {
@@ -164,22 +183,7 @@ export default function (Router){
         });
 
     });
-    const genSalt = (str, minSaltLength) => {
-        minSaltLength = minSaltLength > str.length ? str.length : minSaltLength;
-        const salt = [];
-        let saltLen = 0;
-        while(saltLen < minSaltLength) {
-            salt.push(String.fromCharCode((Math.floor(Math.random() * 0xFFF))));
-            saltLen++;
-        }
-        return salt.join('');
-    };
-    const encryptPassword = (psw, salt) => {
-        return psw;
-    };
-    const oAuth = (email, password) => {
-        return {authToken: 1, accessToken: 1};
-    };
+
 
     /****
      * Inputer: { orgId: key/number, ssId: key/number, teaId name: string}
@@ -210,6 +214,8 @@ export default function (Router){
         }
         courseModel.createCourse(newCourse.name, newCourse.usrId, newCourse.ssId, newCourse.orgId)
             .then( result => {
+                result.classname = newCourse.name;
+                result.ssid = newCourse.ssId;
                 res.status(200).send(result);
             }).catch(err => {
             res.status(500).send(err);
@@ -231,8 +237,43 @@ export default function (Router){
             res.status(500).send(err);
         });
     });
+    Router.patch('/editPost', function(req, res, next){
+        const eI = req.body.editInfo;
+        if(!eI || !eI.tokens || eI.postId)
+            return res.status(422).send("Err confirming user and/or post");
+        if(( !eI.text || eI.text.trim().length == 0))
+            return res.status(422).send("Edit requires new post to be made");
+
+        const text = eI.text;
+        const postId = eI.postid;
+        const userInfo = mapAccessTokenToUserInfo(eI.tokens.accessToken);
+        courseModel.editPost(userInfo.userId, postId, text )
+            .then( result => {
+                res.status(200).send({text, postId });
+            }).catch(err => {
+            res.status(500).send(err);
+        });
+    });
+
     const mapAccessTokenToUserInfo = (token) => {
-        return {orgId:1, usrId:26};
+        return {orgId:1, usrId:6};
     };
+    const genSalt = (str, minSaltLength) => {
+        minSaltLength = minSaltLength > str.length ? str.length : minSaltLength;
+        const salt = [];
+        let saltLen = 0;
+        while(saltLen < minSaltLength) {
+            salt.push(String.fromCharCode((Math.floor(Math.random() * 0xFFF))));
+            saltLen++;
+        }
+        return salt.join('');
+    };
+    const encryptPassword = (psw, salt) => {
+        return psw;
+    };
+    const oAuth = (email, password) => {
+        return {authToken: 1, accessToken: 1};
+    };
+
     return Router;
 }
