@@ -9,6 +9,14 @@ export function getCourses( responseStream, userId){
             responseStream.status(200).send(result);
         }).catch(err => {  responseStream.status(500).send([]);});
 }
+export function getSchoolSessions( responseStream, orgId){
+    courseModel.loadSchoolSessions(orgId)
+        .then( result => {
+            responseStream.status(200).send(result);
+        }).catch(err => {
+        responseStream.status(500).send(err);
+    });
+}
 
 export function createCourse(responseStream, orgId, usrId, title, ssId){
     if(isNaN(orgId) || orgId < 0 ) {

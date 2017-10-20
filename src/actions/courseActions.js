@@ -49,7 +49,7 @@ export function loadUsersCourses(tokens){
     return function(dispatch){
         if(!tokens) return Promise.reject("Invalid authorization to create new course");
         dispatch(startAjaxCall());
-        return axios.post(`http://${config.host}:${config.port}/v1/courses`, {userInfo: {tokens}})
+        return axios.post(`http://${config.host}:${config.port}/v1/courses`, {tokens})
             .then(courses => {
                 dispatch(loadUsersCoursesSuccess(courses.data));
             }, err => {
@@ -106,7 +106,7 @@ export function loadSchoolSessions(tokens){
         if(!tokens) return Promise.reject("Invalid authorization to get school sessions");
         dispatch(startAjaxCall());
         return axios.post(`http://${config.host}:${config.port}/v1/getSchoolSessions`, {
-                userInfo: {tokens}
+                tokens
             })
             .then(sessions => {
                 dispatch(loadSchoolSessionsSuccess(sessions.data));
@@ -122,7 +122,8 @@ export function createCourse(name, ssId, tokens){
         if(!tokens) return Promise.reject("Invalid authorization to create new course");
         dispatch(startAjaxCall());
         return axios.post(`http://${config.host}:${config.port}/v1/createCourse`, {
-            courseInfo: {name, ssId, tokens}
+            courseInfo: {name, ssId},
+            tokens
         })
         .then(createdCourse => {
             dispatch(createCourseSuccess(createdCourse.data));

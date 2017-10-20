@@ -7,52 +7,62 @@ import * as courseAPI from './coursesAPI';
 
 const minSaltSize = 6;
 const minEmailSize = 5;
-//TODO extract the api logic out to a controller folder
+//TODO extract the api logic out to controller files
 //TODO set up middleware for non fatal errors? like if we call next() from a func it should go to that error next
 export default function (Router){
-
     //Can set middleware for router to do things like log api usage, authenticate, etc..
 
-    Router.post('/courses', function(req, res, next){
-        const uI = req.body.userInfo;
-        if(!uI || !uI.tokens ) return res.status(401).send("Not authroized");
-        const tokens = uI.tokens;
-        const userInfo = mapAccessTokenToUserInfo(tokens.accessToken);
-
-        courseAPI.getCourses( res, userInfo.usrId);
+    Router.use(function(req, res, next){
+        console.log(req.method, req.url);
+        const tokens = req.body.tokens;
+        if( req.url == '/courses' || req.url == '/createCourse' || req.url == '/getSchoolSessions') {
+            if (!tokens || tokens.accessToken === null || tokens.accessToken === undefined)
+                return res.status(401).send("Couldn't authroize action");
+            else {
+                req.body.userInfo = mapAccessTokenToUserInfo(tokens);
+                next();
+            }
+        }
+        else {
+            next();
+        }
     });
 
+
     /****
-     * Inputer: { orgId: key/number, ssId: key/number, teaId name: string}
+      * Input: user's info ->  {userInfo: {usrId: number}}
+      * Output: courses -> [{classid: number, classname: str, ssid: number }, ...]
+      */
+    Router.post('/courses', function(req, res, next){
+        const uI = req.body.userInfo;
+        if(!uI || !uI.usrId ) return res.status(401).send("Not authroized");
+
+        courseAPI.getCourses( res, uI.usrId);
+    });
+    /****
+     * Input:  user's info -> {userInfo: {usrId: num, orgId: num} }
+     * Output: course -> {classid: number, classname: str, ssid: number }
      */
     Router.post('/createCourse', function(req, res, next){
         const newCourse = req.body.courseInfo;
-        if(!newCourse || !newCourse.tokens)
-            return res.status(400).send("No course info specified: Not authorized");
-        const tokens = newCourse.tokens;
-        const userInfo = mapAccessTokenToUserInfo(tokens.accessToken);
+        const uI = req.body.userInfo;
+        if(!newCourse || !uI)
+            return res.status(401).send("No course info specified: Not authorized");
 
-        courseAPI.createCourse(res, userInfo.orgId, userInfo.usrId, newCourse.title, newCourse.ssId)
+        courseAPI.createCourse(res, uI.orgId, uI.usrId, newCourse.title, newCourse.ssId)
     });
-/*
-    Router.post('/courses', function(req, res, next){
-        const newCourse = req.body.course;
-        if(!newCourse || !newCourse.orgId || !newCourse.title)
-            res.status(422).send("Incorrect input for creating a new course");
+    /****
+     * Input: user's info -> {userInfo: {orgId: num} }
+     * Output: schoolSessions -> [ { ssid: num, session: str }, ... ]
+     */
+    Router.post('/getSchoolSessions', function(req, res, next){
+        const uI = req.body.userInfo;
+        if(!uI || !uI.orgId ) return res.status(401).send("Not authroized");
 
-        const {orgId, title, ssid} = newCourse;
-        courseModel.createCourse(orgId, title, ssid);
+        courseAPI.getSchoolSessions(res, uI.orgId);
     });
-    */
 
-    /* Probably need to seperate each 'keyword' ex courses, threads, etc into own router to use Router.param to auth operation
-       Router.param is good for auth because it'll run regardless of Router.METHOD used
 
-    Router.param('classId', function(req, res, next){
-       //TODO do auth for threads ops here
-        next();
-    });
-    */
     Router.get('/threadsByClassId/:classId', function(req, res, next){
         const classId = req.params.classId;
         if(!classId || isNaN(classId) || classId < 1)
@@ -184,59 +194,6 @@ export default function (Router){
 
     });
 
-
-    /****
-     * Inputer: { orgId: key/number, ssId: key/number, teaId name: string}
-     */
-    Router.post('/createCourse', function(req, res, next){
-        const newCourse = req.body.courseInfo;
-        if(!newCourse || !newCourse.tokens)
-            return res.status(400).send("Not authorized");
-        const tokens = newCourse.tokens;
-        const userInfo = mapAccessTokenToUserInfo(tokens.accessToken);
-        newCourse.orgId = userInfo.orgId;
-        newCourse.usrId = userInfo.usrId;
-        //TODO either deduce/map/create orgId from tokens or use tokens to validate that org id is valid
-        if(!newCourse) {
-            return res.status(422).send("No course info specified");
-        }
-        if(isNaN(newCourse.orgId) || newCourse.orgId < 0 ) {
-            return res.status(422).send("Invalid  oganization");
-        }
-        if( isNaN(newCourse.ssId) || newCourse.ssId < 0) {
-            return res.status(422).send("Invalid  school session");
-        }
-        if(isNaN(newCourse.usrId) || newCourse.usrId < 0) {
-            return res.status(422).send("Invalid teacher ");
-        }
-        if(!newCourse.name || newCourse.name.trim().length < 3 ) {
-            return res.status(422).send("Course needs name with at least 3 characters");
-        }
-        courseModel.createCourse(newCourse.name, newCourse.usrId, newCourse.ssId, newCourse.orgId)
-            .then( result => {
-                result.classname = newCourse.name;
-                result.ssid = newCourse.ssId;
-                res.status(200).send(result);
-            }).catch(err => {
-            res.status(500).send(err);
-        });
-
-
-    });
-
-    Router.post('/getSchoolSessions', function(req, res, next){
-        const uI = req.body.userInfo;
-        if(!uI || !uI.tokens ) return res.status(401).send("Not authroized");
-        const tokens = uI.tokens;
-
-        const userInfo = mapAccessTokenToUserInfo(tokens.accessToken);
-        courseModel.loadSchoolSessions(userInfo.orgId)
-            .then( result => {
-                res.status(200).send(result);
-            }).catch(err => {
-            res.status(500).send(err);
-        });
-    });
     Router.patch('/editPost', function(req, res, next){
         const eI = req.body.editInfo;
         if(!eI || !eI.tokens || eI.postId)
