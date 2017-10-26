@@ -53,10 +53,12 @@ class CoursePage extends React.Component{
     render(){
         return (
             <div className="container" style={styles.wrapper}>
+                <article>
                     <ThreadDirectory threads={this.props.threads} searchAction={this.onSearchTermChange} setThreadFocus={this.setThreadFocus}/>
                     <MainDisplay createPost={this.props.actions.createPost} threadId={this.state.threadFocusId}
                                  thread={this.props.threads.find(e => e.id === this.state.threadFocusId)}
                                  posts={this.getPostsOrHomepage()} userName={this.props.userName}    />
+                </article>
             </div>
         );
     }

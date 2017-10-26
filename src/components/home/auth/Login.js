@@ -32,7 +32,7 @@ class Login extends React.Component{
 
     render() {
         return (
-            <div>
+            <div style={{position: 'absolute', top:0, right:20, marginRight: '30px', width: '280px'}}>
                 <TextEmailInput name="email" type="email" placeholder="email:" value={this.state.email}
                                 onChange={this.onFieldChange} />
                 <TextEmailInput name="password" type="password" placeholder="password:" value={this.state.password}

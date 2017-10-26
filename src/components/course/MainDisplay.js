@@ -5,7 +5,7 @@ import React from 'react';
 import * as courseAction from '../../actions/courseActions';
 import Comment from './Comment';
 import CommentForm from './CommentForm';
-
+import CourseHomePage from './CourseHomePage';
 const responsetopostid = 'responsetopostid';
 
 const styles = {
@@ -14,7 +14,7 @@ const styles = {
         borderStyle: 'solid',
         borderColor: '#aaaeef',
         width: '70%',
-        height: '350px',
+        //height: '700px',
         marginTop: 40
         /*
         width: '80%',
@@ -130,7 +130,7 @@ class MainDisplay extends React.Component{
             return(
                 <div  key={post.id}>
                     <Comment  toggleOpenCommentForm={this.toggleOpenCommentForm} indentLevel={padding}
-                             paddingMultiplier={20} post={post} defaultPosterName={this.props.userName}
+                             paddingMultiplier={35} post={post} defaultPosterName={this.props.userName}
                     />
                     <CommentForm display={this.state.parentOfNewPost == post.id}
                             createPost={this.submitReplyPost}
@@ -138,6 +138,11 @@ class MainDisplay extends React.Component{
                 </div>
             );
         });
+    }
+    printHomepage(course){
+        return(
+            <CourseHomePage courseTitle="Titty class" />
+        )
     }
     render() {
         return (
@@ -147,7 +152,12 @@ class MainDisplay extends React.Component{
                 <br/>
                 <span> Leave a comment here: </span>
                 <CommentForm display={true} createPost={this.submitTopLevelPost}/>
-                {this.printComments(this.props.posts)}
+                {
+                    (!( this.props.posts && this.props.posts.length > 0) ) ?
+                        this.printHomepage({})
+                    :
+                        this.printComments(this.props.posts)
+                }
             </div>
         );
     }

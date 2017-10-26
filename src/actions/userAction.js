@@ -26,6 +26,7 @@ export function createUser(userInfo){
     return function(dispatch){
        if(! userInfo) return Promise.reject('No userInfo Specified');
        dispatch(startAjaxCall());
+        console.log("userInfo"); console.log(userInfo);
        return axios.post(`http://${config.host}:${config.port}/v1/createUser`, {signupInfo: userInfo})
             .then( resp => {
                 const user = resp.data;

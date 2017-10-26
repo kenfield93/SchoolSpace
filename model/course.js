@@ -62,7 +62,7 @@ courseModel.loadSchoolSessions = (orgId) => {
         return result.rows;
     });
 };
-courseModel.getThreadPosts = (thrId) => {
+courseModel.getPosts = (thrId) => {
     var sql =
         "SELECT tp.id, text, responseToPostId, postTime, likeCnt, name " +
         "FROM ( SELECT p.usrId AS usrId, p.responseToPostId, p.postText as text, p.postId as id, p.postTime, p.likeCnt " +

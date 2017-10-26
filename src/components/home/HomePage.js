@@ -41,15 +41,18 @@ class HomePage extends React.Component {
     }
     render(){
         return(
-            <div className="jumbotron">
-                <h1>Welcome to School Space!</h1>
-                <p> Written in ES6 using Node.js, Express.js, PSQL, React, Redux, and React Router </p>
+            <div>
                 <Login userLoginAction={this.loginUser} loginStatus={this.state.loginStatus} />
-                <br/>
-                <Link to="about" className="btn btn-primary btn-lg">Learn More</Link>
-                <br /><br /><br /><br />
-                <Signup userSignupAction={this.signupUser} signupStatus={this.state.signupStatus} />
+                <div className="jumbotron">
+                    <h1>Welcome to School Space!</h1>
+                    <p> Written in ES6 using Node.js, Express.js, PSQL, React, Redux, and React Router </p>
+                    {/* <Login userLoginAction={this.loginUser} loginStatus={this.state.loginStatus} /> */ }
+                    <br/>
+                    <Link to="about" className="btn btn-primary btn-lg">Learn More</Link>
+                    <br /><br /><br /><br />
+                    <Signup userSignupAction={this.signupUser} signupStatus={this.state.signupStatus} />
 
+                </div>
             </div>
         );
     }

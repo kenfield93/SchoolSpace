@@ -4,13 +4,12 @@
 import userModel from '../../../../model/users';
 import courseModel from '../../../../model/course';
 import * as courseAPI from './coursesAPI';
-
-const minSaltSize = 6;
-const minEmailSize = 5;
+import * as userAPI from './userAPI';
 //TODO extract the api logic out to controller files
 //TODO set up middleware for non fatal errors? like if we call next() from a func it should go to that error next
 export default function (Router){
-    //Can set middleware for router to do things like log api usage, authenticate, etc..
+    /*******************************************/
+    //Router middleware for things like  log api usage, authenticate, etc..
 
     Router.use(function(req, res, next){
         console.log(req.method, req.url);
@@ -28,6 +27,10 @@ export default function (Router){
         }
     });
 
+    const mapAccessTokenToUserInfo = (token) => {
+        return {orgId:1, usrId:6};
+    };
+    /********************************************/
 
     /****
       * Input: user's info ->  {userInfo: {usrId: number}}
@@ -49,7 +52,7 @@ export default function (Router){
         if(!newCourse || !uI)
             return res.status(401).send("No course info specified: Not authorized");
 
-        courseAPI.createCourse(res, uI.orgId, uI.usrId, newCourse.title, newCourse.ssId)
+        courseAPI.createCourse(res, uI.orgId, uI.usrId, newCourse.title, newCourse.ssId);
     });
     /****
      * Input: user's info -> {userInfo: {orgId: num} }
@@ -60,6 +63,44 @@ export default function (Router){
         if(!uI || !uI.orgId ) return res.status(401).send("Not authroized");
 
         courseAPI.getSchoolSessions(res, uI.orgId);
+    });
+    /* Input: loginInfo: {uniqueIdentifier: str, password: str}, Tokens:{accessToken, authToken}
+     Output:
+     On success returns
+     {
+     name: str
+     teaId: int/null
+     stdId: int/null
+     email: str
+     }
+     */
+    Router.post('/login', function(req, res, next){
+        const loginInfo = req.body.loginInfo;
+        if(!loginInfo || !loginInfo.uniqueIdentifier || !loginInfo.password || loginInfo.password.length < 8)
+            return res.status(422).send("Error: Incorrect Signup info");
+
+        userAPI.loginUser( res, userAPI.userLoginInfo(loginInfo));
+
+    });
+    /* Input:
+     singupInfo: {
+        name: str
+        email: str
+        password: str
+        confirmPassword: str
+     }, tokens:{authToken: str, accessToken: str}
+     Output:
+     On success returns true, else err
+     */
+    //TODO can extract out signup validation and use it front end as well
+    Router.post('/createUser', function(req, res, next){
+        // const user = {},
+        const info  = req.body.signupInfo;
+
+        if(!info || !info.password || !info.confirmPassword || !info.email)
+            return res.status(422).send("Error: Incorrect Signup info");
+
+        userAPI.createUser(res, info);
     });
 
 
@@ -77,7 +118,7 @@ export default function (Router){
         const thrId = req.params.threadId;
         if(!thrId || isNaN(thrId) )
             return res.status(422).send("Error: Must get posts by ThreadId");
-        courseModel.getThreadPosts(thrId)
+        courseModel.getPosts(thrId)
             .then(result => {
                 res.status(200).send(result);
             }).catch(err => {
@@ -109,91 +150,6 @@ export default function (Router){
 
     });
 
-    /* Input: {uniqueIdentifier: str, password: str}
-       Output:
-       On success returns
-       {
-        name: str
-        teaId: int/null
-        stdId: int/null
-        email: str
-        tokens: { authToken: str, accessToken: str}
-       }
-     */
-    Router.post('/login', function(req, res, next){
-        const loginInfo = req.body.loginInfo;
-        if(!loginInfo || !loginInfo.uniqueIdentifier || !loginInfo.password || loginInfo.password.length < 8)
-            return res.status(422).send("Error: Incorrect Signup info");
-
-        const email = loginInfo.uniqueIdentifier;
-
-        const loginInfoPromise = userModel.getUserLoginInfo(email)
-            .then( result => {
-                const pwd = encryptPassword(loginInfo.password, result.salt);
-                if( pwd === loginInfo.password) {
-                    const tokens = oAuth(email,pwd);
-                    return Promise.resolve({email, tokens});
-                }
-                return Promise.reject("Incorrect Login info");
-            }).catch(err => {
-                return err;
-            });
-
-        loginInfoPromise.then(info => {
-                userModel.getUserAccountInfo(info.email)
-                    .then(result => {
-                        const user = Object.assign(Object.assign({}, info), result );
-                        user.isTeacher = !!user.isteacher;
-                        user.isStudent = !!user.isstudent;
-                        res.status(200).send(user);
-                    });
-        }).catch(err => {
-           res.status(500).send(null);
-        });
-    });
-    /* Input:
-     {
-     name: str
-     email: str
-     password: str
-     confirmPassword: str
-     }
-     Output:
-     On success returns true, else err
-
-     */
-    //TODO can extract this validatoin out and then use it front end & backend
-    Router.post('/createUser', function(req, res, next){
-        const user = {},
-            info  = req.body.signupInfo;
-        console.log("createUser");
-        console.log(info);
-        if(!info)
-            return res.status(422).send("Error: Incorrect Signup info");
-        if(info.password !== info.confirmPassword ) {
-            return res.status(422).send("Error: Passwords don't match");
-        }
-        if(info.email.indexOf('@') == -1 || info.email.length <= minEmailSize){
-            return res.status(422).send("Error: Email Too short or not valid");
-        }
-        if(!info.name)
-            return res.status(422).send("Error: No nam");
-        // todo other password validation. No illegal characters, etc
-
-        user.salt = genSalt(info.password, minSaltSize);
-        user.password = encryptPassword(info.password, user.salt);
-        user.email = info.email;
-        user.name = info.name;
-
-        userModel.insertUser(user)
-            .then( result => {
-                res.status(200).send(true);
-            }).catch(err => {
-                res.status(500).send(err);
-        });
-
-    });
-
     Router.patch('/editPost', function(req, res, next){
         const eI = req.body.editInfo;
         if(!eI || !eI.tokens || eI.postId)
@@ -211,26 +167,6 @@ export default function (Router){
             res.status(500).send(err);
         });
     });
-
-    const mapAccessTokenToUserInfo = (token) => {
-        return {orgId:1, usrId:6};
-    };
-    const genSalt = (str, minSaltLength) => {
-        minSaltLength = minSaltLength > str.length ? str.length : minSaltLength;
-        const salt = [];
-        let saltLen = 0;
-        while(saltLen < minSaltLength) {
-            salt.push(String.fromCharCode((Math.floor(Math.random() * 0xFFF))));
-            saltLen++;
-        }
-        return salt.join('');
-    };
-    const encryptPassword = (psw, salt) => {
-        return psw;
-    };
-    const oAuth = (email, password) => {
-        return {authToken: 1, accessToken: 1};
-    };
 
     return Router;
 }
