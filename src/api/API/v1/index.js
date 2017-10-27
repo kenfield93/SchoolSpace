@@ -152,15 +152,17 @@ export default function (Router){
 
     Router.patch('/editPost', function(req, res, next){
         const eI = req.body.editInfo;
-        if(!eI || !eI.tokens || eI.postId)
+        if(!eI || !eI.tokens || !eI.postId) {
             return res.status(422).send("Err confirming user and/or post");
-        if(( !eI.text || eI.text.trim().length == 0))
+        }
+        if(( !eI.text || eI.text.trim().length == 0)) {
             return res.status(422).send("Edit requires new post to be made");
+        }
 
         const text = eI.text;
-        const postId = eI.postid;
+        const postId = eI.postId;
         const userInfo = mapAccessTokenToUserInfo(eI.tokens.accessToken);
-        courseModel.editPost(userInfo.userId, postId, text )
+        courseModel.editPost(userInfo.usrId, postId, text )
             .then( result => {
                 res.status(200).send({text, postId });
             }).catch(err => {

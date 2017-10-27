@@ -35,10 +35,11 @@ class MainDisplay extends React.Component{
         super(props);
         this.state={
             postText: '',
-            parentOfNewPost: null
+            parentOfNewPost: null // id of post who's reply or edit button was clicked. TODO rename
         };
 
         this.submitReplyPost = this.submitReplyPost.bind(this);
+        this.submitEditPost = this.submitEditPost.bind(this);
         this.submitTopLevelPost = this.submitTopLevelPost.bind(this);
         this.toggleOpenCommentForm = this.toggleOpenCommentForm.bind(this);
     }
@@ -100,6 +101,10 @@ class MainDisplay extends React.Component{
             this.props.createPost(post);
             this.setState({parentOfNewPost: null});
     }
+    submitEditPost(text){
+        console.log("Editing to %s", text);
+        this.props.editPost(this.state.parentOfNewPost, text);
+    }
     submitTopLevelPost(text){
             this.setState({parentOfNewPost:null}, () =>{
                 this.submitReplyPost(text);
@@ -130,10 +135,8 @@ class MainDisplay extends React.Component{
             return(
                 <div  key={post.id}>
                     <Comment  toggleOpenCommentForm={this.toggleOpenCommentForm} indentLevel={padding}
-                             paddingMultiplier={35} post={post} defaultPosterName={this.props.userName}
-                    />
-                    <CommentForm display={this.state.parentOfNewPost == post.id}
-                            createPost={this.submitReplyPost}
+                             paddingMultiplier={35} post={post} targetedPost={this.state.parentOfNewPost} defaultPosterName={this.props.userName}
+                              commentActions={{reply: this.submitReplyPost, edit: this.submitEditPost}}
                     />
                 </div>
             );
@@ -151,7 +154,7 @@ class MainDisplay extends React.Component{
                 <p style={{fontSize:24}}> <b><i> {(this.props.thread) ? this.props.thread.title : ''} </i></b> </p>
                 <br/>
                 <span> Leave a comment here: </span>
-                <CommentForm display={true} createPost={this.submitTopLevelPost}/>
+                <CommentForm display={true} postAction={this.submitTopLevelPost}/>
                 {
                     (!( this.props.posts && this.props.posts.length > 0) ) ?
                         this.printHomepage({})

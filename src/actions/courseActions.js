@@ -27,6 +27,12 @@ export function createPostSuccess(post, threadId){
 export function createPostFailure(err){
     return {type: types.CREATE_POST_FAILURE, err};
 }
+export function editPostSuccess(postId, text){
+    return {type: types.EDIT_POST_SUCCESS, payload: {postId, text}};
+}
+export function editPostFailure(err){
+    return {type: types.EDIT_POST_FAILURE, err};
+}
 export function createCourseSuccess(course){
     return {type: types.CREATE_COURSE_SUCCESS, course};
 }
@@ -97,6 +103,21 @@ export function createPost(newPost){
             dispatch(createPostSuccess(createdPost.data, threadId));
         }).catch(err => {
             dispatch(createPostFailure(err));
+        });
+    };
+}
+
+export function editPost(tokens, postId, text){
+    return function(dispatch){
+      if(!postId || !text) return Promise.reject('Error: post and/or text not specified for editting');
+      dispatch(startAjaxCall());
+      return axios.patch(`http://${config.host}:${config.port}/v1/editPost`, {
+          editInfo: { postId, text, tokens }
+      })
+        .then( ({postId, text}) => {
+            dispatch(editPostSuccess(postId, text));
+        }).catch(err => {
+            dispatch(editPostFailure(err));
         });
     };
 }

@@ -111,7 +111,7 @@ courseModel.createPost = ({usrId, threadId, responseToId, text}) => {
 courseModel.editPost  = (userId, postId, text) => {
     var sql =
         `UPDATE ${posts} SET postText = $1 ` +
-        "WHERE userId = $2 AND postId = $3"
+        "WHERE usrId = $2 AND postId = $3"
     ;
 
     return dbPool.preparedquery(sql, [text, userId, postId], function(err, result){
