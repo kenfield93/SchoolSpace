@@ -92,18 +92,18 @@ class MainDisplay extends React.Component{
         return printOrder;
     }
 /********************************************************************/
-
    submitReplyPost(text) {
             const post = {};
             post.text = text;
             post.responsetoid = this.state.parentOfNewPost;
             post.threadId = this.props.threadId;
             this.props.createPost(post);
-            this.setState({parentOfNewPost: null});
+            //this.setState({parentOfNewPost: null});
+            this.toggleOpenCommentForm();
     }
     submitEditPost(text){
-        console.log("Editing to %s", text);
-        this.props.editPost(this.state.parentOfNewPost, text);
+        this.props.editPost(this.props.threadId, this.state.parentOfNewPost, text);
+        this.toggleOpenCommentForm();
     }
     submitTopLevelPost(text){
             this.setState({parentOfNewPost:null}, () =>{
@@ -144,7 +144,7 @@ class MainDisplay extends React.Component{
     }
     printHomepage(course){
         return(
-            <CourseHomePage courseTitle="Titty class" />
+            <CourseHomePage courseTitle="Test class" />
         )
     }
     render() {

@@ -83,7 +83,7 @@ function mapDispatchToProps(dispatch, ownProps){
     const loadThreads = () => dispatch(courseAction.loadCourseThreads(courseId));
     const loadPostsFromDB = (id=-1) => dispatch(courseAction.loadPostsByThread(id));
     const createPost = (post) => dispatch(courseAction.createPost(post));
-    const editPost = (postId, text) => dispatch(courseAction.editPost(tokens, postId, text));
+    const editPost = (threadId, postId, text) => dispatch(courseAction.editPost(tokens, threadId, postId, text));
     loadThreads();
     return{
         actions:{

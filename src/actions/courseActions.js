@@ -27,8 +27,8 @@ export function createPostSuccess(post, threadId){
 export function createPostFailure(err){
     return {type: types.CREATE_POST_FAILURE, err};
 }
-export function editPostSuccess(postId, text){
-    return {type: types.EDIT_POST_SUCCESS, payload: {postId, text}};
+export function editPostSuccess(threadId, postId, text){
+    return {type: types.EDIT_POST_SUCCESS, payload: {threadId, postId, text}};
 }
 export function editPostFailure(err){
     return {type: types.EDIT_POST_FAILURE, err};
@@ -107,15 +107,15 @@ export function createPost(newPost){
     };
 }
 
-export function editPost(tokens, postId, text){
+export function editPost(tokens, threadId, postId, text){
     return function(dispatch){
       if(!postId || !text) return Promise.reject('Error: post and/or text not specified for editting');
       dispatch(startAjaxCall());
       return axios.patch(`http://${config.host}:${config.port}/v1/editPost`, {
-          editInfo: { postId, text, tokens }
+          editInfo: { threadId, postId, text, tokens }
       })
-        .then( ({postId, text}) => {
-            dispatch(editPostSuccess(postId, text));
+        .then( (result ) => {
+            dispatch(editPostSuccess(threadId, result.data.postId, result.data.text));
         }).catch(err => {
             dispatch(editPostFailure(err));
         });
