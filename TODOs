@@ -1,1 +1,4 @@
 Create generic Form react component. Then refactor Signup/Login using it
+Think about exposing userInfo using React's context since a lot of things need it
+
+Got comments to not all reload. Want form to close when clicked on

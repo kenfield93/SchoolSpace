@@ -55,9 +55,9 @@ class CoursePage extends React.Component{
             <div className="container" style={styles.wrapper}>
                 <article>
                     <ThreadDirectory threads={this.props.threads} searchAction={this.onSearchTermChange} setThreadFocus={this.setThreadFocus}/>
-                    <MainDisplay createPost={this.props.actions.createPost} editPost={this.props.actions.editPost} threadId={this.state.threadFocusId}
+                    <MainDisplay createPost={this.props.actions.createPost} editPost={this.props.actions.editPost}
                                  thread={this.props.threads.find(e => e.id === this.state.threadFocusId)}
-                                 posts={this.getPostsOrHomepage()} userName={this.props.userName}    />
+                                 posts={this.getPostsOrHomepage()} userName={this.props.userName} userId={this.props.userId}    />
                 </article>
             </div>
         );
@@ -73,7 +73,8 @@ function mapStateToProps(state, ownProps){
     return{
         posts: state.posts? state.posts : {},
         threads:  state.threads? state.threads : [],
-        userName: "Kyle Enfield"
+        userName: "Kyle Enfield",
+        userId: 6
     };
 }
 

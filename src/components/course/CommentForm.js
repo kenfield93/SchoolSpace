@@ -6,12 +6,16 @@ import React from 'react';
 class CommentForm extends React.Component{
     constructor(props){
         super(props);
-        console.log(" display: %s  It's sad to know theres no honest way %s", props.display, props.initPostText);
         this.state={
             postText: props.initPostText || ""
         };
         this.onPostTextChange = ((txt) => {  this.setState({postText: txt.target.value});}).bind(this);
         this.onFormSubmit = this.onFormSubmit.bind(this);
+    }
+
+    componentWillReceiveProps(nextProps){
+        if( this.props.initPostText != nextProps.initPostText)
+            this.setState({postText: nextProps.initPostText});
     }
 
     onFormSubmit(event){

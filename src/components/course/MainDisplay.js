@@ -96,16 +96,16 @@ class MainDisplay extends React.Component{
             const post = {};
             post.text = text;
             post.responsetoid = this.state.parentOfNewPost;
-            post.threadId = this.props.threadId;
+            post.threadId = this.props.thread.id;
             this.props.createPost(post);
-            //this.setState({parentOfNewPost: null});
             this.toggleOpenCommentForm();
     }
     submitEditPost(text){
-        this.props.editPost(this.props.threadId, this.state.parentOfNewPost, text);
+        this.props.editPost(this.props.thread.id, this.state.parentOfNewPost, text);
         this.toggleOpenCommentForm();
     }
     submitTopLevelPost(text){
+
             this.setState({parentOfNewPost:null}, () =>{
                 this.submitReplyPost(text);
             });
@@ -135,7 +135,7 @@ class MainDisplay extends React.Component{
             return(
                 <div  key={post.id}>
                     <Comment  toggleOpenCommentForm={this.toggleOpenCommentForm} indentLevel={padding}
-                             paddingMultiplier={35} post={post} targetedPost={this.state.parentOfNewPost} defaultPosterName={this.props.userName}
+                             paddingMultiplier={35} post={post} targetedPost={this.state.parentOfNewPost} userName={this.props.userName} userId={this.props.userId}
                               commentActions={{reply: this.submitReplyPost, edit: this.submitEditPost}}
                     />
                 </div>
@@ -154,7 +154,7 @@ class MainDisplay extends React.Component{
                 <p style={{fontSize:24}}> <b><i> {(this.props.thread) ? this.props.thread.title : ''} </i></b> </p>
                 <br/>
                 <span> Leave a comment here: </span>
-                <CommentForm display={true} postAction={this.submitTopLevelPost}/>
+                <CommentForm display={true} commentAction={this.submitTopLevelPost}/>
                 {
                     (!( this.props.posts && this.props.posts.length > 0) ) ?
                         this.printHomepage({})

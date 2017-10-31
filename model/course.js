@@ -64,7 +64,7 @@ courseModel.loadSchoolSessions = (orgId) => {
 };
 courseModel.getPosts = (thrId) => {
     var sql =
-        "SELECT tp.id, text, responseToPostId, postTime, likeCnt, name " +
+        "SELECT tp.id, text, responseToPostId, postTime, likeCnt, name, u.usrId AS usrId " +
         "FROM ( SELECT p.usrId AS usrId, p.responseToPostId, p.postText as text, p.postId as id, p.postTime, p.likeCnt " +
         `FROM ${posts} p INNER JOIN ${threads} t ` +
         "ON p.thrId = t.thrId " +
