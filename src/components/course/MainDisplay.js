@@ -17,16 +17,16 @@ const styles = {
         //height: '700px',
         marginTop: 40
         /*
-        width: '80%',
-        //  position: 'absolute',
-        //paddingBottom: 10,
-        borderStyle: 'solid',
-        borderColor: '#aaaeef',
-        borderWidth: 1,
-        marginBottom: 10,
-        marginLeft: '10px',
-        float: 'right'
-        */
+         width: '80%',
+         //  position: 'absolute',
+         //paddingBottom: 10,
+         borderStyle: 'solid',
+         borderColor: '#aaaeef',
+         borderWidth: 1,
+         marginBottom: 10,
+         marginLeft: '10px',
+         float: 'right'
+         */
     }
 };
 
@@ -34,22 +34,20 @@ class MainDisplay extends React.Component{
     constructor(props){
         super(props);
         this.state={
-            postText: '',
-            parentOfNewPost: null // id of post who's reply or edit button was clicked. TODO rename
+            postText: ''
         };
 
         this.submitReplyPost = this.submitReplyPost.bind(this);
         this.submitEditPost = this.submitEditPost.bind(this);
         this.submitTopLevelPost = this.submitTopLevelPost.bind(this);
-        this.toggleOpenCommentForm = this.toggleOpenCommentForm.bind(this);
     }
 
     /*************************************************************************
-      These 2 functions are responsible for rearanging the posts array into an array
-      of posts in the correct order to be printed, along with their indention level
+     These 2 functions are responsible for rearanging the posts array into an array
+     of posts in the correct order to be printed, along with their indention level
      */
 
-     /*
+    /*
      * @param posts: array of posts
      * @returns {Map} inverted hashmap where the parent post id maps to it's child post id
      *                rather than post.id mapping to responsetopostid
@@ -91,36 +89,22 @@ class MainDisplay extends React.Component{
         printCommentsHelper(key, printOrder, 0);
         return printOrder;
     }
-/********************************************************************/
-   submitReplyPost(text) {
-            const post = {};
-            post.text = text;
-            post.responsetoid = this.state.parentOfNewPost;
-            post.threadId = this.props.thread.id;
-            this.props.createPost(post);
-            this.toggleOpenCommentForm();
+    /********************************************************************/
+    submitReplyPost(postId, text) {
+        const post = {};
+        post.text = text;
+        post.responsetoid = postId;
+        post.threadId = this.props.thread.id;
+        this.props.createPost(post);
     }
-    submitEditPost(text){
-        this.props.editPost(this.props.thread.id, this.state.parentOfNewPost, text);
-        this.toggleOpenCommentForm();
+    submitEditPost(postId, text){
+        this.props.editPost(this.props.thread.id, postId, text);
     }
     submitTopLevelPost(text){
-
-            this.setState({parentOfNewPost:null}, () =>{
-                this.submitReplyPost(text);
-            });
+        this.submitReplyPost(null, text)
     }
 
-    toggleOpenCommentForm( parentPostId=null){
-        this.setState((prevState, props)=>{
-            if(prevState.parentOfNewPost == parentPostId){
-                return {parentOfNewPost: null};
-            }
-            else{
-                return {parentOfNewPost: parentPostId};
-            }
-        });
-    }
+
 
     //Todo, sort by likecount or timestamp. Either stick to one or let user chose or maybe sort by time the first 24 hour then like count after
     /*
@@ -134,8 +118,8 @@ class MainDisplay extends React.Component{
 
             return(
                 <div  key={post.id}>
-                    <Comment  toggleOpenCommentForm={this.toggleOpenCommentForm} indentLevel={padding}
-                             paddingMultiplier={35} post={post} targetedPost={this.state.parentOfNewPost} userName={this.props.userName} userId={this.props.userId}
+                    <Comment   indentLevel={padding} paddingMultiplier={35} post={post}
+                               userName={this.props.userName} userId={this.props.userId}
                               commentActions={{reply: this.submitReplyPost, edit: this.submitEditPost}}
                     />
                 </div>
@@ -158,7 +142,7 @@ class MainDisplay extends React.Component{
                 {
                     (!( this.props.posts && this.props.posts.length > 0) ) ?
                         this.printHomepage({})
-                    :
+                        :
                         this.printComments(this.props.posts)
                 }
             </div>

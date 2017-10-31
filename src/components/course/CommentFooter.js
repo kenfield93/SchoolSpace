@@ -16,26 +16,42 @@ class CommentFooter extends React.Component {
         super(props);
         this.state = {
           commentAction: null,
-          textToDisplayOnCommentForm: ""
+          textToDisplayOnCommentForm: "",
+            toggleReplyForm: false,
+            toggleEditForm: false
         };
         this.onReply = this.onReply.bind(this);
         this.onEdit = this.onEdit.bind(this);
+        this.clearFormToggles = this.clearFormToggles.bind(this);
     }
 
-    shouldComponentUpdate(nextProps, nextState){
-        return true;
+    clearFormToggles(){
+        return new Promise( (resolve, reject) =>{
+            this.setState({toggleEditForm: false, toggleReplyForm: false}, resolve());
+        })
     }
     onReply(event){
-        this.setState({commentAction: this.props.commentActions.reply, textToDisplayOnCommentForm: ""});
-        this.props.comment(event);
-    }
-    onEdit(event){
-        this.setState({commentAction: this.props.commentActions.edit,  textToDisplayOnCommentForm: this.props.post.text}, () => {
-            this.props.comment(event);
+        const replyState = this.state.toggleReplyForm;
+        this.clearFormToggles().then( () => {
+            this.setState({
+                commentAction: this.props.commentActions.reply,
+                textToDisplayOnCommentForm: "",
+                toggleReplyForm: !replyState
+            });
         });
     }
+    onEdit(event){
+        const editState = this.state.toggleEditForm;
+        this.clearFormToggles().then( () => {
+            this.setState({
+                commentAction: this.props.commentActions.edit,
+                textToDisplayOnCommentForm: this.props.post.text,
+                toggleEditForm: !editState
+            });
+        });
+    }
+
     displayEdit(){
-        // targetedPostText={this.props.post.text }
         if(this.props.post.usrid == this.props.userId)
             return <li style={styles} onClick={this.onEdit} >Edit</li>
     }
@@ -49,7 +65,10 @@ class CommentFooter extends React.Component {
 
                     <li style={styles}>Report</li>
                 </ul>
-                <CommentForm display={this.props.display} initPostText={this.state.textToDisplayOnCommentForm} commentAction={this.state.commentAction}/>
+                <CommentForm clearForm={this.clearFormToggles} display={this.state.toggleReplyForm || this.state.toggleEditForm}
+                             postId={this.props.post.id} initPostText={this.state.textToDisplayOnCommentForm}
+                             commentAction={this.state.commentAction}
+                />
             </div>
         );
     }
