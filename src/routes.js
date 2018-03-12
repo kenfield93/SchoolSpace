@@ -3,12 +3,12 @@
  */
 import React from 'react';
 import {Route, IndexRoute} from 'react-router';
-import AppTemplate from './components/AppTemplate';
-import HomePage from './components/home/HomePage';
-import AboutPage from './components/about/AboutPage';
+import AppTemplate from 'React/components/AppTemplate';
+import HomePage from 'React/components/home/HomePage';
+import AboutPage from 'React/components/about/AboutPage';
 //import CoursesPage from './components/course/.CoursesPage';
-import ClassDirectory from './components/users/students/ClassDirectory';
-import CoursePage from './components/course/CoursePage';
+import ClassDirectory from 'React/components/users/students/ClassDirectory';
+import CoursePage from 'React/components/course/CoursePage';
 
  /*Always load AppTemplate since its on / path, then the specific comonent
    will get passed to it as it's children, depending on what path we're on

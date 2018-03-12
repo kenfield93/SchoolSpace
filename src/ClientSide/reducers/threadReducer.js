@@ -1,7 +1,7 @@
 /**
  * Created by kyle on 9/25/17.
  */
-import types from '../actions/actionTypes';
+import types from '../ClientSide/actions/actionTypes';
 import initialState from './initialState';
 
 //todo set up reducer and actions. need to pass posts and thread id for thus part but not to actual store

@@ -2,7 +2,7 @@
  * Created by kyle on 9/23/17.
  */
 import initialState from './initialState';
-import types from '../actions/actionTypes';
+import types from '../ClientSide/actions/actionTypes';
 
 function actionTypeEndsInSuccess(type){
     return type.substring(type.length - 8) == '_SUCCESS';

@@ -1,18 +1,26 @@
 /**
  * Created by kyle on 10/4/17.
  */
-import userModel from '../../../../model/users';
-import courseModel from '../../../../model/course';
-import * as courseAPI from './coursesAPI';
-import * as userAPI from './userAPI';
+import pgAdapter from '../../../DAL/PGAdapter';
+import courseRepo from '../../../DAL/CourseRepo';
+import userRepo from '../../../DAL/UsersRepo';
+import coursesAPI from './coursesAPI';
+import userAPI from './userAPI';
 //TODO extract the api logic out to controller files
 //TODO set up middleware for non fatal errors? like if we call next() from a func it should go to that error next
-export default function (Router){
+export default function (Router, dbConfig){
     /*******************************************/
     //Router middleware for things like  log api usage, authenticate, etc..
 
+
+    var dbAdapter = pgAdapter(dbConfig);
+    var cRepo = courseRepo(dbAdapter);
+    var uRepo = userRepo(dbAdapter);
+    var courseApi = coursesAPI(cRepo);
+    var userApi = userAPI(uRepo);
+
     Router.use(function(req, res, next){
-        console.log(req.method, req.url);
+
         const tokens = req.body.tokens;
         if( req.url == '/courses' || req.url == '/createCourse' || req.url == '/getSchoolSessions') {
             if (!tokens || tokens.accessToken === null || tokens.accessToken === undefined)
@@ -40,8 +48,9 @@ export default function (Router){
         const uI = req.body.userInfo;
         if(!uI || !uI.usrId ) return res.status(401).send("Not authroized");
 
-        courseAPI.getCourses( res, uI.usrId);
+        courseApi.getCourses( res, uI.usrId);
     });
+
     /****
      * Input:  user's info -> {userInfo: {usrId: num, orgId: num} }
      * Output: course -> {classid: number, classname: str, ssid: number }
@@ -52,7 +61,7 @@ export default function (Router){
         if(!newCourse || !uI)
             return res.status(401).send("No course info specified: Not authorized");
 
-        courseAPI.createCourse(res, uI.orgId, uI.usrId, newCourse.title, newCourse.ssId);
+        courseApi.createCourse(res, uI.orgId, uI.usrId, newCourse.title, newCourse.ssId);
     });
     /****
      * Input: user's info -> {userInfo: {orgId: num} }
@@ -62,7 +71,7 @@ export default function (Router){
         const uI = req.body.userInfo;
         if(!uI || !uI.orgId ) return res.status(401).send("Not authroized");
 
-        courseAPI.getSchoolSessions(res, uI.orgId);
+        courseApi.getSchoolSessions(res, uI.orgId);
     });
     /* Input: loginInfo: {uniqueIdentifier: str, password: str}, Tokens:{accessToken, authToken}
      Output:
@@ -79,7 +88,7 @@ export default function (Router){
         if(!loginInfo || !loginInfo.uniqueIdentifier || !loginInfo.password || loginInfo.password.length < 8)
             return res.status(422).send("Error: Incorrect Signup info");
 
-        userAPI.loginUser( res, userAPI.userLoginInfo(loginInfo));
+        userApi.loginUser( res, userApi.userLoginInfo(loginInfo));
 
     });
     /* Input:
@@ -100,7 +109,7 @@ export default function (Router){
         if(!info || !info.password || !info.confirmPassword || !info.email)
             return res.status(422).send("Error: Incorrect Signup info");
 
-        userAPI.createUser(res, info);
+        userApi.createUser(res, info);
     });
 
 

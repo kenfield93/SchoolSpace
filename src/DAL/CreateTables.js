@@ -1,25 +1,14 @@
 /**
- * Created by kyle on 9/13/17.
+ * Created by kyle on 3/10/18.
  */
-/**
- * Created by kyle on 9/10/16.
- */
-import config from '../tools/config';
-//const pg = require('pg');
-import pg from 'pg';
-const dbConfig = config.dbConfig;
-const pool = new pg.Pool(dbConfig);
-pool.on('error', (err, client) => {
-   console.log("PG Error %s ", JSON.stringify(client));
-});
 
 
 const organization = () => {
     return (
         "CREATE TABLE organization( " +
-         "orgId SERIAL PRIMARY KEY, " +
+        "orgId SERIAL PRIMARY KEY, " +
         "title TEXT UNIQUE NOT NULL, " +
-         "email TEXT NOT NULL);"
+        "email TEXT NOT NULL);"
     );
 };
 //not in BFNF since we have org here and in class which has org id and ssid. Since we aren't going to be altering orgId,
@@ -57,19 +46,19 @@ const student = () => {
 };
 const userToClass = () => {
     return(
-      "CREATE TABLE userToClass( " +
-      " classId INTEGER NOT NULL REFERENCES class(classId), " +
-      " usrId INTEGER NOT NULL REFERENCES users(usrId) );"
+        "CREATE TABLE userToClass( " +
+        " classId INTEGER NOT NULL REFERENCES class(classId), " +
+        " usrId INTEGER NOT NULL REFERENCES users(usrId) );"
     );
 };
 /*
-const studentToClass = () => {
-    return(
-        "CREATE TABLE studentToClass( " +
-        " classId INTEGER NOT NULL REFERENCES class(classId), " +
-        " stuId   INTEGER NOT NULL REFERENCES student(stuId) );"
-    );
-};*/
+ const studentToClass = () => {
+ return(
+ "CREATE TABLE studentToClass( " +
+ " classId INTEGER NOT NULL REFERENCES class(classId), " +
+ " stuId   INTEGER NOT NULL REFERENCES student(stuId) );"
+ );
+ };*/
 
 //TODO thing about extracting out email to seperate table
 const users = () => {
@@ -106,9 +95,9 @@ const topic = () => {
 };
 
 /*Note need to do something for thread/post when creating tables since they both ref eachother
-* I manually commented out mainPostId, and then altered table to add it once post table was created
-* ALTER TABLE thread ADD COLUMN mainPostId INTEGER REFERENCES post(postId);
-* */
+ * I manually commented out mainPostId, and then altered table to add it once post table was created
+ * ALTER TABLE thread ADD COLUMN mainPostId INTEGER REFERENCES post(postId);
+ * */
 const thread = () => {
 
     return(
@@ -146,40 +135,3 @@ const post = () => {
         " likeCnt INTEGER DEFAULT 0); "
     );
 };
-
-export default
-{
-    preparedquery: (text, values, cb) => {
-        return pool.connect().then(function (client) {
-            return new Promise(function (resolve, reject) {
-                client.query(text, values, function (err, result) {
-                    var outcome = cb(err, result);
-                    if (outcome == false || outcome == null) {
-                        reject(err);
-                    }
-                    else {
-                        resolve(outcome);
-                    }
-                });
-                client.release();
-            });
-        });
-    },
-    query: (text,  cb) => {
-        return pool.connect().then(function (client) {
-            return new Promise(function (resolve, reject) {
-                client.query(text, function (err, result) {
-                    var outcome = cb(err, result);
-                    if (outcome == false || outcome == null) {
-                        reject(err);
-                    }
-                    else {
-                        resolve(outcome);
-
-                    }
-                });
-                client.release();
-            });
-        });
-    }
-}

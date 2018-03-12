@@ -1,7 +1,7 @@
 /**
  * Created by kyle on 10/17/17.
  */
-import types from '../actions/actionTypes';
+import types from '../ClientSide/actions/actionTypes';
 import initialState from './initialState';
 
 export default function schoolSessionReducer(state = initialState.schoolSessions, action){

@@ -5,11 +5,11 @@
 import 'babel-polyfill';
 import React from 'react';
 import {render} from 'react-dom';
-import configureStore from './store/configureStore';
+import configureStore from 'React/store/configureStore';
 import {Provider} from 'react-redux';
 import {Router, browserHistory} from 'react-router';
 import routes from './routes';
-import './styles/styles.css'; // Webpack bundles these 2 css files w/ our JS
+import 'ClientSide/styles/styles.css'; // Webpack bundles these 2 css files w/ our JS
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 
 /* can pass initial state to store to overwrite courseReducer initial state

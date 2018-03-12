@@ -10,7 +10,6 @@ import bodyparser from 'body-parser';
 
 import config from './../tools/config';
 /* eslint-disable no-console */
-import userModel from '../model/users';
 import apiRouterFactory from './api';
 
 console.log("ayyo");
@@ -18,6 +17,7 @@ console.log("ayyo");
 const port = config.port;
 const app = express();
 const compiler = webpack(webpackConfig);
+const dbConfig = config.dbConfig;
 
 app.use(require('webpack-dev-middleware')(compiler, {
     noInfo: true,
@@ -28,7 +28,7 @@ app.use(require('webpack-hot-middleware')(compiler));
 app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({extended: true}));
 
-const apiRouter = apiRouterFactory(express.Router());
+const apiRouter = apiRouterFactory(express.Router(), dbConfig);
 app.use('/v1', apiRouter );
 
 // diside which routes form what pages. Probably have each class as a seprate page
